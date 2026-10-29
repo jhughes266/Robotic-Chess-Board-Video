@@ -1,12 +1,12 @@
 import math
-
+import copy
 import cv2
 import numpy as np
 from abc import ABC, abstractmethod
 
 class PrimitiveElement:
-    def __init__(self, position, colour, drawProportion):
-        self.position = position
+    def __init__(self, position, colour, drawProportion, sampleFrame):
+        self.position = self.toPixel(position, sampleFrame)
         self.colour = colour
         self.drawProportion = drawProportion
 
@@ -27,9 +27,9 @@ class PrimitiveElement:
         pass
 
 class Line(PrimitiveElement):
-    def __init__(self, pt1, pt2, colour, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
-        super().__init__(pt1, colour, drawProportion)
-        self.pt2 = pt2
+    def __init__(self, pt1, pt2, colour, sampleFrame, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
+        super().__init__(pt1, colour, drawProportion, sampleFrame)
+        self.pt2 = self.toPixel(pt2, sampleFrame)
         self.thickness = thickness
         self.lineType = lineType
 
@@ -41,8 +41,8 @@ class Line(PrimitiveElement):
         self.pt2[1] += delta[1]
 
     def draw(self, frame):
-        pt1 = self.toPixel(self.position, frame)
-        pt2 = self.toPixel(self.pt2, frame)
+        pt1 = copy.deepcopy(self.position)
+        pt2 = copy.deepcopy(self.pt2)
 
         fullOpposite = pt2[0] - pt1[0]
         fullAdjacent = pt2[1] - pt1[1]
@@ -63,12 +63,12 @@ class Line(PrimitiveElement):
                  lineType=self.lineType)
 
 class ArrowedLine(Line):
-    def __init__(self, pt1, pt2, colour, thickness=1, lineType=8, drawProportion=1):
-        super().__init__(pt1=pt1, pt2=pt2, colour=colour, thickness=thickness, lineType=lineType, drawProportion=drawProportion)
+    def __init__(self, pt1, pt2, colour, sampleFrame, thickness=1, lineType=8, drawProportion=1):
+        super().__init__(pt1=pt1, pt2=pt2, colour=colour, thickness=thickness, lineType=lineType, drawProportion=drawProportion, sampleFrame=sampleFrame)
 
     def draw(self, frame):
-        pt1 = self.toPixel(self.position, frame)
-        pt2 = self.toPixel(self.pt2, frame)
+        pt1 = copy.deepcopy(self.position)
+        pt2 = copy.deepcopy(self.pt2)
 
         fullOpposite = pt2[0] - pt1[0]
         fullAdjacent = pt2[1] - pt1[1]
@@ -89,9 +89,9 @@ class ArrowedLine(Line):
                         line_type=self.lineType)
 
 class Rectangle(PrimitiveElement):
-    def __init__(self, pt1, pt2, colour, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
-        super().__init__(pt1, colour, drawProportion)
-        self.pt2 = pt2
+    def __init__(self, pt1, pt2, colour, sampleFrame, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
+        super().__init__(pt1, colour, drawProportion, sampleFrame=sampleFrame)
+        self.pt2 = self.toPixel(pt2, sampleFrame)
         self.thickness = thickness
         self.lineType = lineType
 
@@ -103,9 +103,8 @@ class Rectangle(PrimitiveElement):
         self.pt2[1] += delta[1]
 
     def draw(self, frame):
-
-        pt1 = self.toPixel(self.position, frame)
-        pt2 = self.toPixel(self.pt2, frame)
+        pt1 = self.position
+        pt2 = self.pt2
 
         perimeterLength = 2 * (pt2[0] - pt1[0] + pt2[1] - pt1[1])
 
@@ -157,8 +156,8 @@ class Rectangle(PrimitiveElement):
                      lineType=self.lineType)
 
 class Ellipse(PrimitiveElement):
-    def __init__(self, center, axes, angle, startAngle, endAngle, colour, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
-        super().__init__(center, colour, drawProportion)
+    def __init__(self, center, axes, angle, startAngle, endAngle, colour, sampleFrame, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
+        super().__init__(center, colour, drawProportion, sampleFrame=sampleFrame)
         self.axes = axes
         self.angle = angle
         self.startAngle = startAngle
@@ -171,7 +170,7 @@ class Ellipse(PrimitiveElement):
         self.position[1] += delta[1]
 
     def draw(self, frame):
-        centre = self.toPixel(self.position, frame)
+        centre = self.position
 
         totalAngle = self.endAngle - self.startAngle
         propAngle = totalAngle * self.drawProportion
@@ -187,8 +186,8 @@ class Ellipse(PrimitiveElement):
                     lineType=self.lineType)
 
 class Text(PrimitiveElement):
-    def __init__(self, text, org, fontFace, fontScale, colour,  backgroundColour=(0,0,0), thickness=1, lineType=cv2.LINE_8, drawProportion=1, progressiveDrawMode='enlarge', insertCursorThickness=1):
-        super().__init__(org, colour, drawProportion)
+    def __init__(self, text, org, fontFace, fontScale, colour, sampleFrame,  backgroundColour=(0,0,0), thickness=1, lineType=cv2.LINE_8, drawProportion=1, progressiveDrawMode='enlarge', insertCursorThickness=1):
+        super().__init__(org, colour, drawProportion, sampleFrame=sampleFrame)
         self.text = text
         self.fontFace = fontFace
         self.fontScale = fontScale
@@ -203,7 +202,7 @@ class Text(PrimitiveElement):
         self.position[1] += delta[1]
 
     def draw(self, frame):
-        org = self.toPixel(self.position, frame)
+        org = copy.deepcopy(self.position)
         if self.progressiveDrawMode == 'enlarge':
 
             propScale = self.fontScale * self.drawProportion
@@ -256,8 +255,8 @@ class Text(PrimitiveElement):
 
 
 class Image(PrimitiveElement):
-    def __init__(self, topLeft, imgPath, imageWidth, colour=None, backgroundColour=(0,0,0), drawProportion=1, maxNumBlurs = 1):
-        super().__init__(topLeft, colour, drawProportion)
+    def __init__(self, topLeft, imgPath, imageWidth, sampleFrame, colour=None, backgroundColour=(0,0,0), drawProportion=1, maxNumBlurs = 1):
+        super().__init__(topLeft, colour, drawProportion, sampleFrame=sampleFrame)
         self.imgPath = imgPath
         self.image = cv2.imread(imgPath)
         self.imageWidth = imageWidth
@@ -270,7 +269,7 @@ class Image(PrimitiveElement):
         self.position[0] += delta[1]
 
     def draw(self, frame):
-        topLeft = self.toPixel(self.position, frame)
+        topLeft = self.position
 
         newPixelWidth = int(frame.shape[1] * self.imageWidth)
         oldPixelWidth = self.image.shape[1]
