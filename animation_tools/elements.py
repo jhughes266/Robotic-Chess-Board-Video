@@ -15,6 +15,9 @@ class PrimitiveElement:
         pixelPosition = [frameWidth * position[0], frameHeight * position[1]]
         return pixelPosition
 
+    def updateDrawProportion(self, newProportion):
+        self.drawProportion = min(max(newProportion, 0),1)
+
     @abstractmethod
     def draw(self, frame):
         pass
@@ -184,13 +187,16 @@ class Ellipse(PrimitiveElement):
                     lineType=self.lineType)
 
 class Text(PrimitiveElement):
-    def __init__(self, text, org, fontFace, fontScale, colour, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
+    def __init__(self, text, org, fontFace, fontScale, colour,  backgroundColour=(0,0,0), thickness=1, lineType=cv2.LINE_8, drawProportion=1, progressiveDrawMode='enlarge', insertCursorThickness=1):
         super().__init__(org, colour, drawProportion)
         self.text = text
         self.fontFace = fontFace
         self.fontScale = fontScale
+        self.backgroundColour = backgroundColour
         self.thickness = thickness
         self.lineType = lineType
+        self.progressiveDrawMode = progressiveDrawMode
+        self.insertCursorThickness = insertCursorThickness
 
     def updatePosition(self, delta):
         self.position[0] += delta[0]
@@ -198,25 +204,91 @@ class Text(PrimitiveElement):
 
     def draw(self, frame):
         org = self.toPixel(self.position, frame)
+        if self.progressiveDrawMode == 'enlarge':
 
-        propScale = self.fontScale * self.drawProportion
+            propScale = self.fontScale * self.drawProportion
 
-        retVal, baseLine = cv2.getTextSize(self.text, fontFace=self.fontFace, fontScale=propScale, thickness=self.thickness)
-        textWidth, textHeight = retVal[0], retVal[1]
+            retVal, baseLine = cv2.getTextSize(self.text, fontFace=self.fontFace, fontScale=propScale, thickness=self.thickness)
+            textWidth, textHeight = retVal[0], retVal[1]
 
-        org[0] -= textWidth / 2
-        org[1] -= textHeight / 2
+            org[0] -= textWidth / 2
+            org[1] -= textHeight / 2
 
-        cv2.putText(img=frame,
-                    text=self.text,
-                    org=(int(org[0]), int(org[1])),
-                    fontFace=self.fontFace,
-                    fontScale=propScale,
-                    color=self.colour,
-                    thickness=self.thickness,
-                    lineType=self.lineType
-                    )
+            cv2.putText(img=frame,
+                        text=self.text,
+                        org=(int(org[0]), int(org[1])),
+                        fontFace=self.fontFace,
+                        fontScale=propScale,
+                        color=self.colour,
+                        thickness=self.thickness,
+                        lineType=self.lineType
+                        )
+        elif self.progressiveDrawMode == 'letterByLetter':
+            retVal, baseLine = cv2.getTextSize(self.text, fontFace=self.fontFace, fontScale=self.fontScale, thickness=self.thickness)
+            textWidth, textHeight = retVal[0], retVal[1]
+
+            pixelsRevealed = textWidth * self.drawProportion
+            pixelsHidden = textWidth - pixelsRevealed
+
+            cv2.putText(img=frame,
+                        text=self.text,
+                        org=(int(org[0]), int(org[1])),
+                        fontFace=self.fontFace,
+                        fontScale=self.fontScale,
+                        color=self.colour,
+                        thickness=self.thickness,
+                        lineType=self.lineType
+                        )
+
+            cv2.rectangle(img=frame,
+                          pt1=(int(org[0] + pixelsRevealed), int(org[1] - textHeight)),
+                          pt2=(int(org[0] + pixelsRevealed + self.insertCursorThickness), int(org[1])),
+                          color=self.colour,
+                          thickness=-1,
+                          lineType=self.lineType)
+
+            cv2.rectangle(img=frame,
+                          pt1=(int(org[0] + pixelsRevealed + self.insertCursorThickness + 1), int(org[1] - textHeight)),
+                          pt2=(int(org[0] + textWidth), int(org[1])),
+                          color=self.backgroundColour,
+                          thickness=-1,
+                          lineType=self.lineType)
+
 
 class Image(PrimitiveElement):
-    def __init__(self, pt1, pt2, colour, thickness, lineType, drawProportion):
-        super().__init__(pt1, colour, drawProportion)
+    def __init__(self, topLeft, imgPath, imageWidth, colour=None, backgroundColour=(0,0,0), drawProportion=1, maxNumBlurs = 1):
+        super().__init__(topLeft, colour, drawProportion)
+        self.imgPath = imgPath
+        self.image = cv2.imread(imgPath)
+        self.imageWidth = imageWidth
+        self.backgroundColour = backgroundColour
+        self.maxNumBlurs = maxNumBlurs
+
+    def updatePosition(self, delta):
+        # x, y switch because of slicing
+        self.position[1] += delta[0]
+        self.position[0] += delta[1]
+
+    def draw(self, frame):
+        topLeft = self.toPixel(self.position, frame)
+
+        newPixelWidth = int(frame.shape[1] * self.imageWidth)
+        oldPixelWidth = self.image.shape[1]
+        newPixelHeight = int((newPixelWidth / oldPixelWidth) * self.image.shape[0])
+
+        newImage = cv2.resize(self.image, (newPixelWidth, newPixelHeight))
+
+        for i in range(int(self.maxNumBlurs - self.drawProportion * self.maxNumBlurs)):
+            newImage = cv2.blur(newImage, (10,10))
+
+        frameDrawSection = frame[int(topLeft[0]) : (int(topLeft[0]) + newPixelHeight), int(topLeft[1]) : (int(topLeft[1]) + newPixelWidth)]
+
+        difference = newImage - frameDrawSection
+
+        propDifference = difference * self.drawProportion
+
+        propNewImage = propDifference + frameDrawSection
+
+        frame[int(topLeft[0]): (int(topLeft[0]) + newPixelHeight), int(topLeft[1]): (int(topLeft[1]) + newPixelWidth)] = propNewImage
+
+
