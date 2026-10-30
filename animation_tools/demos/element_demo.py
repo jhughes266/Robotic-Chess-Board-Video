@@ -1,5 +1,3 @@
-import cv2
-import numpy as np
 from animation_tools.elements import *
 videoWidth = 1280
 videoHeight = 720
@@ -10,13 +8,13 @@ fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 outputVideo = cv2.VideoWriter(outputFile, fourcc, fps, (videoWidth, videoHeight))
 sampleFrame= np.zeros((videoHeight, videoWidth, 3), np.uint8)
 
-testLine = Line(pt1=[0.1,0.7], pt2=[0.3,0.7], colour=(0,255,0),thickness=5, drawProportion=0, sampleFrame=sampleFrame)
-testArrowedLine = ArrowedLine(pt1=[0.3,0.7], pt2=[0.1,0.5], colour=(0,255,0),thickness=5, drawProportion=0, sampleFrame=sampleFrame)
-testRectangle = Rectangle(pt1=[0.0,0.2], pt2=[0.3,0.3], colour=(0,255,0),thickness=5, drawProportion=0.90, sampleFrame=sampleFrame)
-testEllipse = Ellipse(center=[0.5,0.6], axes=(75,75), angle=0, startAngle=30, endAngle=390, colour=(0,0,255), thickness=5, drawProportion=0.30, sampleFrame=sampleFrame)
-testText = Text(text="Hello World", org=[0.5,0.5], fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1, colour=(255,255,255), drawProportion=1, progressiveDrawMode='letterByLetter', insertCursorThickness=5, sampleFrame=sampleFrame)
+testLine = Line(pt1=[0.1,0.7], pt2=[0.3,0.7], colour=(0,255,0),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+testArrowedLine = ArrowedLine(pt1=[0.3,0.7], pt2=[0.1,0.5], colour=(0,255,0),thickness=5, drawProportion=0,  frameWidth=videoWidth, frameHeight=videoHeight)
+testRectangle = Rectangle(pt1=[0.0,0.2], pt2=[0.3,0.3], colour=(0,255,0),thickness=5, drawProportion=0.90,  frameWidth=videoWidth, frameHeight=videoHeight)
+testEllipse = Ellipse(center=[0.5,0.6], axes=(75,75), angle=0, startAngle=30, endAngle=390, colour=(0,0,255), thickness=5, drawProportion=0.30, frameWidth=videoWidth, frameHeight=videoHeight)
+testText = Text(text="Hello World", org=[0.5,0.5], fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1, colour=(255,255,255), drawProportion=1, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
 
-testImage = Image(topLeft=[0.1,0.0], imgPath='testImage.jpg', imageWidth=.2, colour=None, drawProportion=1, maxNumBlurs = 100, sampleFrame=sampleFrame)
+testImage = Image(topLeft=[0.1,0.0], imgPath='testImage.jpg', imageWidth=.2, colour=None, drawProportion=1, maxNumBlurs = 100, frameWidth=videoWidth, frameHeight=videoHeight)
 
 for i in range(numberOfFrames):
     frame = np.zeros((videoHeight, videoWidth, 3), np.uint8)
