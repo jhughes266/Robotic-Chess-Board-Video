@@ -12,7 +12,7 @@ testArrowedLine = ArrowedLine(pt1=[0.3,0.7], pt2=[0.1,0.5], colour=(0,255,0),thi
 testRectangle = Rectangle(pt1=[0.0,0.0], pt2=[0.3,0.3], colour=(0,255,0),thickness=5, drawProportion=0,  frameWidth=videoWidth, frameHeight=videoHeight)
 testEllipse = Ellipse(center=[0.2,0.3], axes=(75,75), angle=0, startAngle=30, endAngle=390, colour=(0,0,255), thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
 testText = Text(text="Hello World", org=[0.5,0.5], fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1, colour=(255,255,255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
-testImage = Image(topLeft=[0.5,0.5], imgPath='testImage.jpg', imageWidth=.1, colour=None, drawProportion=0, maxNumBlurs = 100, frameWidth=videoWidth, frameHeight=videoHeight)
+testImage = Image(topLeft=[0.5,0.5], imgPath='black_king.jpg', imageWidth=.1, colour=None, drawProportion=0, maxNumBlurs = 100, frameWidth=videoWidth, frameHeight=videoHeight)
 
 # 1st animation: 0 - 2 seconds
 testPrimitiveAnimation1 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.1,.2], startDrawProportion=0, endDrawProportion=1, startTime=0, endTime=2, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
