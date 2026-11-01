@@ -1,9 +1,9 @@
 from animation_tools.elements import *
 from animation_tools.primative_animation import *
 from animation_tools.scene_animation import *
-videoWidth = 1280
-videoHeight = 720
-fps = 60
+videoWidth = 3840
+videoHeight = 2160
+fps = 30
 videoDuration = 10
 testSceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='demo.mp4')
 

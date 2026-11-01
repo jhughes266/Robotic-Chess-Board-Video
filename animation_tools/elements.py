@@ -226,7 +226,7 @@ class Text(PrimitiveElement):
             textWidth, textHeight = retVal[0], retVal[1]
 
             org[0] -= textWidth / 2
-            org[1] -= textHeight / 2
+            org[1] += textHeight / 2
 
             cv2.putText(img=frame,
                         text=self.__text,
@@ -243,6 +243,9 @@ class Text(PrimitiveElement):
 
             pixelsRevealed = textWidth * self._drawProportion
             pixelsHidden = textWidth - pixelsRevealed
+
+            org[0] -= textWidth / 2
+            org[1] += textHeight / 2
 
             cv2.putText(img=frame,
                         text=self.__text,
@@ -263,7 +266,7 @@ class Text(PrimitiveElement):
 
             cv2.rectangle(img=frame,
                           pt1=(int(org[0] + pixelsRevealed + self.__insertCursorThickness + 1), int(org[1] - textHeight)),
-                          pt2=(int(org[0] + textWidth), int(org[1])),
+                          pt2=(int(org[0] + textWidth), int(org[1] + 0.3 * textHeight)),
                           color=self.__backgroundColour,
                           thickness=-1,
                           lineType=self.__lineType)
