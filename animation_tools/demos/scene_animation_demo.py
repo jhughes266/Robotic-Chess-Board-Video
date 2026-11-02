@@ -4,7 +4,7 @@ from animation_tools.scene_animation import *
 videoWidth = 3840
 videoHeight = 2160
 fps = 30
-videoDuration = 10
+videoDuration = 3
 testSceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='demo.mp4')
 
 testLine = Line(pt1=[0.1,0.7], pt2=[0.3,0.7], colour=(0,255,0),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
