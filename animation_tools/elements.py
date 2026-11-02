@@ -127,6 +127,15 @@ class Rectangle(PrimitiveElement):
         propPerimeterLength = perimeterLength * self._drawProportion
         remainingPropPerimeterLength = propPerimeterLength
 
+        if self.__thickness < 0:
+            cv2.rectangle(img=frame,
+                          pt1=(int(pt1[0]), int(pt1[1])),
+                          pt2=(int(pt2[0]), int(pt2[1])),
+                          color=self._colour,
+                          thickness=self.__thickness,
+                          lineType=self.__lineType)
+            return
+
         if (remainingPropPerimeterLength >= 0):
 
             cv2.line(img=frame,
@@ -165,6 +174,8 @@ class Rectangle(PrimitiveElement):
                      color=self._colour,
                      thickness=self.__thickness,
                      lineType=self.__lineType)
+
+
 
 class Ellipse(PrimitiveElement):
     def __init__(self, center, axes, angle, startAngle, endAngle, colour, frameWidth, frameHeight, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
