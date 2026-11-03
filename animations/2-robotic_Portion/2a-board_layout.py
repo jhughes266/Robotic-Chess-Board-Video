@@ -4,7 +4,7 @@ from animation_tools.scene_animation import *
 videoWidth = 3840
 videoHeight = 2160
 fps = 30
-videoDuration = 10
+videoDuration = 11
 
 
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='2a-board_layout.mp4')
@@ -146,7 +146,6 @@ for i in range(11):
         colour = (0, 0, 255)
 
     lightSquare = not lightSquare
-
     chessSquare = Rectangle(pt1=[topLeft[0] + i * squareWidth , topLeft[1] + 11 * squareHeight], pt2=[topLeft[0] + (i + 1) * squareWidth , topLeft[1] + (11 + 1) * squareHeight], colour=colour, thickness=-1, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
     chessSquareAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=startTime, endTime=startTime+squareDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
     chessSquareAnimation.addPrimitive(chessSquare)
@@ -354,6 +353,177 @@ sceneAnimator.addPrimitiveAnimation(textHold)
 textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textVanish.addPrimitive(text)
 sceneAnimator.addPrimitiveAnimation(textVanish)
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+#12 * 12 grid squares label
+textDrawStartTime = 8
+textEndTime = 11
+textLocation = [0.5, 0.075]
+text = Text(text="12 Squares", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(255,255,255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
+
+textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textDraw.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textDraw)
+
+
+textHold = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime+0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textHold.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textHold)
+
+textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textVanish.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textVanish)
+
+
+textLocation = [.75, 0.45]
+text = Text(text="12 Squares", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(255,255,255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
+
+textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textDraw.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textDraw)
+
+
+textHold = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime+0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textHold.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textHold)
+
+textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textVanish.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textVanish)
+
+
+
+# 1
+line = Line(pt1=[0.32,0.075], pt2=[0.425,0.075], colour=(255,255,255),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+lineDrawAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime + 0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineDrawAnimation.addPrimitive(line)
+
+lineHoldAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime + 0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineHoldAnimation.addPrimitive(line)
+
+lineVanishAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime - 0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineVanishAnimation.addPrimitive(line)
+
+sceneAnimator.addPrimitiveAnimation(lineDrawAnimation)
+sceneAnimator.addPrimitiveAnimation(lineHoldAnimation)
+sceneAnimator.addPrimitiveAnimation(lineVanishAnimation)
+
+# 2
+line = Line(pt1=[0.32,0.075], pt2=[0.32,0.075+.05], colour=(255,255,255),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+lineDrawAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime + 0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineDrawAnimation.addPrimitive(line)
+
+lineHoldAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime + 0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineHoldAnimation.addPrimitive(line)
+
+lineVanishAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime - 0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineVanishAnimation.addPrimitive(line)
+
+sceneAnimator.addPrimitiveAnimation(lineDrawAnimation)
+sceneAnimator.addPrimitiveAnimation(lineHoldAnimation)
+sceneAnimator.addPrimitiveAnimation(lineVanishAnimation)
+
+# 3
+line = Line(pt1=[1 - 0.32,0.075], pt2=[ 1 - 0.425,0.075], colour=(255,255,255),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+lineDrawAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime + 0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineDrawAnimation.addPrimitive(line)
+
+lineHoldAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime + 0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineHoldAnimation.addPrimitive(line)
+
+lineVanishAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime - 0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineVanishAnimation.addPrimitive(line)
+
+sceneAnimator.addPrimitiveAnimation(lineDrawAnimation)
+sceneAnimator.addPrimitiveAnimation(lineHoldAnimation)
+sceneAnimator.addPrimitiveAnimation(lineVanishAnimation)
+
+# 4
+line = Line(pt1=[1-0.32,0.075], pt2=[1-0.32,0.075+.05], colour=(255,255,255),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+lineDrawAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime + 0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineDrawAnimation.addPrimitive(line)
+
+lineHoldAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime + 0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineHoldAnimation.addPrimitive(line)
+
+lineVanishAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime - 0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineVanishAnimation.addPrimitive(line)
+
+sceneAnimator.addPrimitiveAnimation(lineDrawAnimation)
+sceneAnimator.addPrimitiveAnimation(lineHoldAnimation)
+sceneAnimator.addPrimitiveAnimation(lineVanishAnimation)
+
+
+# 5
+line = Line(pt1=[0.75-.033,0.13], pt2=[0.75-.033,0.425], colour=(255,255,255),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+lineDrawAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime + 0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineDrawAnimation.addPrimitive(line)
+
+lineHoldAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime + 0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineHoldAnimation.addPrimitive(line)
+
+lineVanishAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime - 0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineVanishAnimation.addPrimitive(line)
+
+sceneAnimator.addPrimitiveAnimation(lineDrawAnimation)
+sceneAnimator.addPrimitiveAnimation(lineHoldAnimation)
+sceneAnimator.addPrimitiveAnimation(lineVanishAnimation)
+
+# 6
+line = Line(pt1=[0.715-.033,0.13], pt2=[0.75-.033,0.13], colour=(255,255,255),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+lineDrawAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime + 0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineDrawAnimation.addPrimitive(line)
+
+lineHoldAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime + 0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineHoldAnimation.addPrimitive(line)
+
+lineVanishAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime - 0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineVanishAnimation.addPrimitive(line)
+
+sceneAnimator.addPrimitiveAnimation(lineDrawAnimation)
+sceneAnimator.addPrimitiveAnimation(lineHoldAnimation)
+sceneAnimator.addPrimitiveAnimation(lineVanishAnimation)
+
+# 7
+line = Line(pt1=[0.75-.033,.77], pt2=[0.75-.033,.5], colour=(255,255,255),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+lineDrawAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime + 0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineDrawAnimation.addPrimitive(line)
+
+lineHoldAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime + 0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineHoldAnimation.addPrimitive(line)
+
+lineVanishAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime - 0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineVanishAnimation.addPrimitive(line)
+
+sceneAnimator.addPrimitiveAnimation(lineDrawAnimation)
+sceneAnimator.addPrimitiveAnimation(lineHoldAnimation)
+sceneAnimator.addPrimitiveAnimation(lineVanishAnimation)
+
+# 8
+line = Line(pt1=[0.715-.033,.77], pt2=[0.75-.033,.77], colour=(255,255,255),thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+lineDrawAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime + 0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineDrawAnimation.addPrimitive(line)
+
+lineHoldAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime + 0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineHoldAnimation.addPrimitive(line)
+
+lineVanishAnimation = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,0.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime - 0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+lineVanishAnimation.addPrimitive(line)
+
+sceneAnimator.addPrimitiveAnimation(lineDrawAnimation)
+sceneAnimator.addPrimitiveAnimation(lineHoldAnimation)
+sceneAnimator.addPrimitiveAnimation(lineVanishAnimation)
+
 # render the animation
 sceneAnimator.renderAnimation()
 
