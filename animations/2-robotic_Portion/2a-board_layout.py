@@ -186,7 +186,7 @@ for enIdx, i in enumerate(range(11,0,-1)):
 squareWidth = 0.03
 squareHeight = (videoWidth / videoHeight) * squareWidth
 drawOffsetTime += 11 * (drawDuration / 12)
-
+textEndTime = None
 for enIdx, i in enumerate(range(11,0,-1)):
     startTime = (enIdx/ 11) * drawDuration + drawOffsetTime
     squareDrawDuration = (drawDuration / 12)
@@ -206,6 +206,25 @@ for enIdx, i in enumerate(range(11,0,-1)):
 
     sceneAnimator.addPrimitiveAnimation(chessSquareAnimation)
     sceneAnimator.addPrimitiveAnimation(chessSquareHoldAnimation)
+    textEndTime = startTime+squareDrawDuration
+
+textDrawStartTime = 3
+textLocation = [0.175, 0.4]
+text = Text(text="Captured piece storage", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(0, 0, 255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
+
+textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textDraw.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textDraw)
+
+
+textHold = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime+0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textHold.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textHold)
+
+textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textVanish.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textVanish)
+""
 
 
 ########################################################################################################################
@@ -220,6 +239,7 @@ topLeft = [((1 - (12 * squareWidth))/ 2) + squareWidth , ((1 - (12 * squareHeigh
 drawDuration = 0.5
 drawOffsetTime = 5
 lightSquare = True
+textDrawStartTime = drawOffsetTime
 for i in range(10):
     startTime = (i/ 11) * drawDuration + drawOffsetTime
     squareDrawDuration = (drawDuration / 12)
@@ -289,11 +309,14 @@ for enIdx, i in enumerate(range(9,0,-1)):
 
     sceneAnimator.addPrimitiveAnimation(chessSquareAnimation)
     sceneAnimator.addPrimitiveAnimation(chessSquareHoldAnimation)
+    textEndTime = startTime+squareDrawDuration
+
 
 # Top Strip
 squareWidth = 0.03
 squareHeight = (videoWidth / videoHeight) * squareWidth
 drawOffsetTime += 11 * (drawDuration / 12)
+textEndTime = None
 for enIdx, i in enumerate(range(9,0,-1)):
     startTime = (enIdx/ 11) * drawDuration + drawOffsetTime
     squareDrawDuration = (drawDuration / 12)
@@ -313,7 +336,24 @@ for enIdx, i in enumerate(range(9,0,-1)):
 
     sceneAnimator.addPrimitiveAnimation(chessSquareAnimation)
     sceneAnimator.addPrimitiveAnimation(chessSquareHoldAnimation)
+    textEndTime = startTime + squareDrawDuration
 
+
+textLocation = [0.175, 0.4]
+text = Text(text="Visual buffer", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(192,192,192), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
+
+textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textDraw.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textDraw)
+
+
+textHold = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime+0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textHold.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textHold)
+
+textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textVanish.addPrimitive(text)
+sceneAnimator.addPrimitiveAnimation(textVanish)
 # render the animation
 sceneAnimator.renderAnimation()
 
