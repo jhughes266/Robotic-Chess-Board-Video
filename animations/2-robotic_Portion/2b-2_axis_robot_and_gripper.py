@@ -35,7 +35,7 @@ class TwoAxisRobotAndGripper:
         connectionHorizontalLength = railTopLegnth
         connectionX = railX
         connectionY = railY
-        xAxisColour = (210, 210, 210)
+        xAxisColour = (190, 190, 190)
         yAxisColour = (70, 70, 70)
         self.__verticalConnection = Line(pt1=[connectionX + connectionHorizontalLength/2, connectionY], pt2=[connectionX + connectionHorizontalLength/2, connectionY + connectionVerticalLength], colour=yAxisColour,
                               thickness=20, drawProportion=0,
@@ -66,7 +66,45 @@ class TwoAxisRobotAndGripper:
         self.__leftBearing = Rectangle(pt1=[carriageCentreX + connectionHorizontalLength/2 - verticalBearingWidth/2, carriageCentreY - verticalBearingLength/2],
                                       pt2=[carriageCentreX + connectionHorizontalLength/2 - verticalBearingWidth/2 + verticalBearingWidth, carriageCentreY - verticalBearingLength/2 + verticalBearingLength],
                                       colour=xAxisColour, thickness=60, drawProportion=0, frameWidth=videoWidth,frameHeight=videoHeight)
+        # Gripper
+        carriageCentreX = ((railX + railX + railTopLegnth) / 2)
+        carriageCentreY = ((railY + railY + railSideLength) / 2)
 
+        xDistanceToGripperTopLeft = 0.0125
+        yDistanceToGripperTopLeft = xDistanceToGripperTopLeft * (videoWidth / videoHeight)
+
+        gripperXPaddelLength = 0.03
+        gripperYPaddelLength = gripperXPaddelLength * (videoWidth / videoHeight)
+
+        gripperTopLeftX = carriageCentreX - xDistanceToGripperTopLeft
+        gripperTopLeftY = carriageCentreY - yDistanceToGripperTopLeft
+
+        topRightGripperColour = (0,0,255)
+        bottomLeftGripperColour = (0,255,0)
+
+        self.__topRightHorizontalGripperPadel = Line(pt1=[gripperTopLeftX + 2 * xDistanceToGripperTopLeft, gripperTopLeftY],
+                                                    pt2=[gripperTopLeftX + 2 * xDistanceToGripperTopLeft - gripperXPaddelLength, gripperTopLeftY],
+                                                    colour=topRightGripperColour,
+                                                    thickness=20, drawProportion=0, frameWidth=videoWidth,
+                                                    frameHeight=videoHeight)
+
+        self.__topRightVerticalGripperPadel = Line(pt1=[gripperTopLeftX + 2 * xDistanceToGripperTopLeft, gripperTopLeftY],
+                                                    pt2=[gripperTopLeftX + 2 * xDistanceToGripperTopLeft, gripperTopLeftY + gripperYPaddelLength],
+                                                    colour=topRightGripperColour,
+                                                    thickness=20, drawProportion=0, frameWidth=videoWidth,
+                                                    frameHeight=videoHeight)
+
+        self.__bottomLeftHorizontalGripperPadel = Line(pt1=[gripperTopLeftX, gripperTopLeftY + 2 * yDistanceToGripperTopLeft],
+                                                    pt2=[gripperTopLeftX + gripperXPaddelLength, gripperTopLeftY + 2 * yDistanceToGripperTopLeft],
+                                                    colour=bottomLeftGripperColour,
+                                                    thickness=20, drawProportion=0, frameWidth=videoWidth,
+                                                    frameHeight=videoHeight)
+
+        self.__bottomLeftVerticalGripperPadel = Line(pt1=[gripperTopLeftX, gripperTopLeftY + 2 * yDistanceToGripperTopLeft],
+                                                    pt2=[gripperTopLeftX, gripperTopLeftY + 2 * yDistanceToGripperTopLeft - gripperYPaddelLength],
+                                                    colour=bottomLeftGripperColour,
+                                                    thickness=20, drawProportion=0, frameWidth=videoWidth,
+                                                    frameHeight=videoHeight)
 
     def drawInAnimation(self):
         drawTime = 2
@@ -84,6 +122,11 @@ class TwoAxisRobotAndGripper:
         drawAnimation.addPrimitive(self.__bottomBearing)
         drawAnimation.addPrimitive(self.__rightBearing)
         drawAnimation.addPrimitive(self.__leftBearing)
+        drawAnimation.addPrimitive(self.__bottomLeftHorizontalGripperPadel)
+        drawAnimation.addPrimitive(self.__bottomLeftVerticalGripperPadel)
+        drawAnimation.addPrimitive(self.__topRightHorizontalGripperPadel)
+        drawAnimation.addPrimitive(self.__topRightVerticalGripperPadel)
+
 
         holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
                                            startDrawProportion=1, endDrawProportion=1, startTime=drawTime, endTime=self.__videoDuration,
@@ -99,6 +142,11 @@ class TwoAxisRobotAndGripper:
         holdAnimation.addPrimitive(self.__bottomBearing)
         holdAnimation.addPrimitive(self.__rightBearing)
         holdAnimation.addPrimitive(self.__leftBearing)
+        holdAnimation.addPrimitive(self.__bottomLeftHorizontalGripperPadel)
+        holdAnimation.addPrimitive(self.__bottomLeftVerticalGripperPadel)
+        holdAnimation.addPrimitive(self.__topRightHorizontalGripperPadel)
+        holdAnimation.addPrimitive(self.__topRightVerticalGripperPadel)
+
 
         sceneAnimator.addPrimitiveAnimation(drawAnimation)
         sceneAnimator.addPrimitiveAnimation(holdAnimation)
