@@ -8,33 +8,34 @@ from animation_tools.scene_animation import *
 class TwoAxisRobotAndGripper:
     def __init__(self, sceneAnimator, videoWidth, videoHeight, videoDuration):
         self.__sceneAnimator = sceneAnimator
-        railTopLegnth = 0.35
-        railSideLength = videoWidth / videoHeight * railTopLegnth
-        railX = (1 - railTopLegnth)/2
-        railY = 0.2
+        self.__railTopLegnth = 0.35
+        self.__railSideLength = videoWidth / videoHeight * self.__railTopLegnth
+        self.__railX = (1 - self.__railTopLegnth)/2
+        self.__railY = 0.2
         self.__videoDuration = videoDuration
-
+        # Keeps track of the time elapsed in the animation
+        self.__currentAnimationTime = 0
         # Rails
-        self.__topRail = Line(pt1=[railX, railY], pt2=[railX + railTopLegnth, railY], colour=(255, 255, 255), thickness=5, drawProportion=0,
+        self.__topRail = Line(pt1=[self.__railX, self.__railY], pt2=[self.__railX + self.__railTopLegnth, self.__railY], colour=(255, 255, 255), thickness=5, drawProportion=0,
                               frameWidth=videoWidth, frameHeight=videoHeight)
-        self.__bottomRail = Line(pt1=[railX, railY + railSideLength], pt2=[railX + railTopLegnth, railY + railSideLength], colour=(255, 255, 255), thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
-        self.__rightRail = Line([railX + railTopLegnth , railY], pt2=[railX + railTopLegnth , railY + railSideLength], colour=(255, 255, 255), thickness=5, drawProportion=0,
+        self.__bottomRail = Line(pt1=[self.__railX, self.__railY + self.__railSideLength], pt2=[self.__railX + self.__railTopLegnth, self.__railY + self.__railSideLength], colour=(255, 255, 255), thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+        self.__rightRail = Line([self.__railX + self.__railTopLegnth , self.__railY], pt2=[self.__railX + self.__railTopLegnth , self.__railY + self.__railSideLength], colour=(255, 255, 255), thickness=5, drawProportion=0,
                               frameWidth=videoWidth, frameHeight=videoHeight)
-        self.__leftRail = Line(pt1=[railX, railY], pt2=[railX, railY + railSideLength], colour=(255, 255, 255), thickness=5, drawProportion=0,
+        self.__leftRail = Line(pt1=[self.__railX, self.__railY], pt2=[self.__railX, self.__railY + self.__railSideLength], colour=(255, 255, 255), thickness=5, drawProportion=0,
                               frameWidth=videoWidth, frameHeight=videoHeight)
 
         # Carriage
         carriageTopLegnth = 0.05
         carriageSideLength = videoWidth / videoHeight * carriageTopLegnth
-        carriageX = ((railX + railX + railTopLegnth) / 2) - (carriageTopLegnth / 2)
-        carriageY = ((railY + railY + railSideLength) / 2) - (carriageSideLength / 2)
+        carriageX = ((self.__railX + self.__railX + self.__railTopLegnth) / 2) - (carriageTopLegnth / 2)
+        carriageY = ((self.__railY + self.__railY + self.__railSideLength) / 2) - (carriageSideLength / 2)
         self.__carriage = Rectangle(pt1=[carriageX, carriageY], pt2=[carriageX + carriageTopLegnth, carriageY + carriageSideLength], colour=(255, 255, 255), thickness=10, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
 
         # Carriage Connections
-        connectionVerticalLength = railSideLength
-        connectionHorizontalLength = railTopLegnth
-        connectionX = railX
-        connectionY = railY
+        connectionVerticalLength = self.__railSideLength
+        connectionHorizontalLength = self.__railTopLegnth
+        connectionX = self.__railX
+        connectionY = self.__railY
         xAxisColour = (190, 190, 190)
         yAxisColour = (70, 70, 70)
         self.__verticalConnection = Line(pt1=[connectionX + connectionHorizontalLength/2, connectionY], pt2=[connectionX + connectionHorizontalLength/2, connectionY + connectionVerticalLength], colour=yAxisColour,
@@ -49,26 +50,26 @@ class TwoAxisRobotAndGripper:
         horizontalBearingWidth = 0.025
         verticalBearingLength = horizontalBearingLength * (videoWidth / videoHeight)
         verticalBearingWidth = horizontalBearingWidth * (videoHeight / videoWidth)
-        carriageCentreX = ((railX + railX + railTopLegnth) / 2)
-        carriageCentreY = ((railY + railY + railSideLength) / 2)
-        self.__topBearing = Rectangle(pt1=[carriageCentreX - horizontalBearingLength / 2, carriageCentreY - connectionVerticalLength/2 - horizontalBearingWidth/2],
-                                      pt2=[carriageCentreX - horizontalBearingLength / 2 + horizontalBearingLength, carriageCentreY - connectionVerticalLength/2 - horizontalBearingWidth/2 + horizontalBearingWidth],
+        self.__carriageCentreX = ((self.__railX + self.__railX + self.__railTopLegnth) / 2)
+        self.__carriageCentreY = ((self.__railY + self.__railY + self.__railSideLength) / 2)
+        self.__topBearing = Rectangle(pt1=[self.__carriageCentreX - horizontalBearingLength / 2, self.__carriageCentreY - connectionVerticalLength/2 - horizontalBearingWidth/2],
+                                      pt2=[self.__carriageCentreX - horizontalBearingLength / 2 + horizontalBearingLength, self.__carriageCentreY - connectionVerticalLength/2 - horizontalBearingWidth/2 + horizontalBearingWidth],
                                       colour=yAxisColour, thickness=60, drawProportion=0, frameWidth=videoWidth,frameHeight=videoHeight)
 
-        self.__bottomBearing = Rectangle(pt1=[carriageCentreX - horizontalBearingLength / 2, carriageCentreY + connectionVerticalLength/2 - horizontalBearingWidth/2],
-                                      pt2=[carriageCentreX - horizontalBearingLength / 2 + horizontalBearingLength, carriageCentreY + connectionVerticalLength/2 - horizontalBearingWidth/2 + horizontalBearingWidth],
+        self.__bottomBearing = Rectangle(pt1=[self.__carriageCentreX - horizontalBearingLength / 2, self.__carriageCentreY + connectionVerticalLength/2 - horizontalBearingWidth/2],
+                                      pt2=[self.__carriageCentreX - horizontalBearingLength / 2 + horizontalBearingLength, self.__carriageCentreY + connectionVerticalLength/2 - horizontalBearingWidth/2 + horizontalBearingWidth],
                                       colour=yAxisColour, thickness=60, drawProportion=0, frameWidth=videoWidth,frameHeight=videoHeight)
 
-        self.__rightBearing = Rectangle(pt1=[carriageCentreX - connectionHorizontalLength/2 - verticalBearingWidth/2, carriageCentreY - verticalBearingLength/2],
-                                      pt2=[carriageCentreX - connectionHorizontalLength/2 - verticalBearingWidth/2 + verticalBearingWidth, carriageCentreY - verticalBearingLength/2 + verticalBearingLength],
+        self.__rightBearing = Rectangle(pt1=[self.__carriageCentreX - connectionHorizontalLength/2 - verticalBearingWidth/2, self.__carriageCentreY - verticalBearingLength/2],
+                                      pt2=[self.__carriageCentreX - connectionHorizontalLength/2 - verticalBearingWidth/2 + verticalBearingWidth, self.__carriageCentreY - verticalBearingLength/2 + verticalBearingLength],
                                       colour=xAxisColour, thickness=60, drawProportion=0, frameWidth=videoWidth,frameHeight=videoHeight)
 
-        self.__leftBearing = Rectangle(pt1=[carriageCentreX + connectionHorizontalLength/2 - verticalBearingWidth/2, carriageCentreY - verticalBearingLength/2],
-                                      pt2=[carriageCentreX + connectionHorizontalLength/2 - verticalBearingWidth/2 + verticalBearingWidth, carriageCentreY - verticalBearingLength/2 + verticalBearingLength],
+        self.__leftBearing = Rectangle(pt1=[self.__carriageCentreX + connectionHorizontalLength/2 - verticalBearingWidth/2, self.__carriageCentreY - verticalBearingLength/2],
+                                      pt2=[self.__carriageCentreX + connectionHorizontalLength/2 - verticalBearingWidth/2 + verticalBearingWidth, self.__carriageCentreY - verticalBearingLength/2 + verticalBearingLength],
                                       colour=xAxisColour, thickness=60, drawProportion=0, frameWidth=videoWidth,frameHeight=videoHeight)
         # Gripper
-        carriageCentreX = ((railX + railX + railTopLegnth) / 2)
-        carriageCentreY = ((railY + railY + railSideLength) / 2)
+        self.__carriageCentreX = ((self.__railX + self.__railX + self.__railTopLegnth) / 2)
+        self.__carriageCentreY = ((self.__railY + self.__railY + self.__railSideLength) / 2)
 
         xDistanceToGripperTopLeft = 0.0125
         yDistanceToGripperTopLeft = xDistanceToGripperTopLeft * (videoWidth / videoHeight)
@@ -76,8 +77,8 @@ class TwoAxisRobotAndGripper:
         gripperXPaddelLength = 0.03
         gripperYPaddelLength = gripperXPaddelLength * (videoWidth / videoHeight)
 
-        gripperTopLeftX = carriageCentreX - xDistanceToGripperTopLeft
-        gripperTopLeftY = carriageCentreY - yDistanceToGripperTopLeft
+        gripperTopLeftX = self.__carriageCentreX - xDistanceToGripperTopLeft
+        gripperTopLeftY = self.__carriageCentreY - yDistanceToGripperTopLeft
 
         topRightGripperColour = (0,0,255)
         bottomLeftGripperColour = (0,255,0)
@@ -106,10 +107,46 @@ class TwoAxisRobotAndGripper:
                                                     thickness=20, drawProportion=0, frameWidth=videoWidth,
                                                     frameHeight=videoHeight)
 
+        #Establishing groupings for movement of the robot
+        self.__xMovementGroup = []
+        self.__xMovementGroup.append(self.__verticalConnection)
+        self.__xMovementGroup.append(self.__bottomBearing)
+        self.__xMovementGroup.append(self.__topBearing)
+        self.__yMovementGroup = []
+        self.__yMovementGroup.append(self.__horizontalConnection)
+        self.__yMovementGroup.append(self.__rightBearing)
+        self.__yMovementGroup.append(self.__leftBearing)
+        self.__xyMovementGroup = []
+        self.__xyMovementGroup.append(self.__carriage)
+        self.__xyMovementGroup.append(self.__topRightVerticalGripperPadel)
+        self.__xyMovementGroup.append(self.__topRightHorizontalGripperPadel)
+        self.__xyMovementGroup.append(self.__bottomLeftVerticalGripperPadel)
+        self.__xyMovementGroup.append(self.__bottomLeftHorizontalGripperPadel)
+        # Grouping for all elements to allow animations to be performed on all elements
+        self.__allGroup = []
+        self.__allGroup.append(self.__topRail)
+        self.__allGroup.append(self.__bottomRail)
+        self.__allGroup.append(self.__rightRail)
+        self.__allGroup.append(self.__leftRail)
+        self.__allGroup.append(self.__carriage)
+        self.__allGroup.append(self.__verticalConnection)
+        self.__allGroup.append(self.__horizontalConnection)
+        self.__allGroup.append(self.__topBearing)
+        self.__allGroup.append(self.__bottomBearing)
+        self.__allGroup.append(self.__rightBearing)
+        self.__allGroup.append(self.__leftBearing)
+        self.__allGroup.append(self.__topRightVerticalGripperPadel)
+        self.__allGroup.append(self.__topRightHorizontalGripperPadel)
+        self.__allGroup.append(self.__bottomLeftVerticalGripperPadel)
+        self.__allGroup.append(self.__bottomLeftHorizontalGripperPadel)
+
+
+
     def drawInAnimation(self):
-        drawTime = 2
+        drawInTime = 2
+        self.__currentAnimationTime += drawInTime
         drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
-                                             startDrawProportion=0, endDrawProportion=1, startTime=0, endTime=drawTime,
+                                             startDrawProportion=0, endDrawProportion=1, startTime=0, endTime=drawInTime,
                                              fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
         drawAnimation.addPrimitive(self.__topRail)
         drawAnimation.addPrimitive(self.__bottomRail)
@@ -129,7 +166,7 @@ class TwoAxisRobotAndGripper:
 
 
         holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
-                                           startDrawProportion=1, endDrawProportion=1, startTime=drawTime, endTime=self.__videoDuration,
+                                           startDrawProportion=1, endDrawProportion=1, startTime=drawInTime, endTime=self.__videoDuration,
                                            fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
         holdAnimation.addPrimitive(self.__topRail)
         holdAnimation.addPrimitive(self.__bottomRail)
@@ -150,6 +187,61 @@ class TwoAxisRobotAndGripper:
 
         sceneAnimator.addPrimitiveAnimation(drawAnimation)
         sceneAnimator.addPrimitiveAnimation(holdAnimation)
+    
+    def moveGantry(self, xGantry, yGantry, duration):
+        x = (xGantry / 120) * self.__railTopLegnth + self.__railX
+        y = (yGantry / 120) * self.__railSideLength + self.__railY
+
+        xDelta = x - self.__carriageCentreX
+        yDelta = y - self.__carriageCentreY
+        self.__carriageCentreX += xDelta
+        self.__carriageCentreY += yDelta
+
+        # x movement
+        xAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[xDelta, 0.0],
+                           startDrawProportion=1, endDrawProportion=1, startTime=self.__currentAnimationTime, endTime=self.__currentAnimationTime + duration,
+                           fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        for primitive in self.__xMovementGroup:
+            xAnimation.addPrimitive(primitive)
+        sceneAnimator.addPrimitiveAnimation(xAnimation)
+
+        # y movement
+        yAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, yDelta],
+                           startDrawProportion=1, endDrawProportion=1, startTime=self.__currentAnimationTime,
+                           endTime=self.__currentAnimationTime + duration,
+                           fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+        for primitive in self.__yMovementGroup:
+            yAnimation.addPrimitive(primitive)
+        sceneAnimator.addPrimitiveAnimation(yAnimation)
+
+        # xy movement
+        xyAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[xDelta, yDelta],
+                           startDrawProportion=1, endDrawProportion=1, startTime=self.__currentAnimationTime,
+                           endTime=self.__currentAnimationTime + duration,
+                           fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        for primitive in self.__xyMovementGroup:
+            xyAnimation.addPrimitive(primitive)
+        sceneAnimator.addPrimitiveAnimation(xyAnimation)
+
+        self.__currentAnimationTime += duration
+
+    def moveEntireRobot(self, xDelta, yDelta, duration):
+
+
+        moveAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[xDelta, yDelta],
+                                        startDrawProportion=1, endDrawProportion=1,
+                                        startTime=self.__currentAnimationTime,
+                                        endTime=self.__currentAnimationTime + duration,
+                                        fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        for primitive in self.__allGroup:
+            moveAnimation.addPrimitive(primitive)
+        sceneAnimator.addPrimitiveAnimation(moveAnimation)
+
+        self.__currentAnimationTime += duration
+
 
 
 
@@ -158,10 +250,17 @@ class TwoAxisRobotAndGripper:
 videoWidth = 3840
 videoHeight = 2160
 fps = 30
-videoDuration = 3
+videoDuration = 10
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='2b-2_axis_robot_and_gripper.mp4')
 twoAxisRobot = TwoAxisRobotAndGripper(sceneAnimator, videoWidth, videoHeight, videoDuration)
 twoAxisRobot.drawInAnimation()
+twoAxisRobot.moveGantry(0, 0, 1)
+twoAxisRobot.moveEntireRobot(0.2,0.2,1)
+twoAxisRobot.moveGantry(60, 80, 1)
+twoAxisRobot.moveGantry(60, 60, 1)
+twoAxisRobot.moveEntireRobot(-0.2,-0.1,1)
+twoAxisRobot.moveEntireRobot(0,-0.1,1)
+
 sceneAnimator.renderAnimation()
 
 
