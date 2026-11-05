@@ -147,24 +147,62 @@ class TwoAxisRobotAndGripper:
         chessBoardTopLeftY = self.__railY + (1 - proportionOfRail)/2 * self.__railSideLength
         sqaureWidth = (proportionOfRail * self.__railTopLength)/12
         squareHeight = (proportionOfRail * self.__railSideLength)/12
-
+        squareWidthOffset = sqaureWidth * 0.03
+        squareHeightOffset = squareHeight * 0.03
         self.__chessFadeRectangles = []
+
+        graveYardDarkColour = (0, 0, 255)
+        graveYardLightColour = (0, 0, 125)
+        graveYardColourFlag = False
+        bufferDarkColour = (125, 125, 125)
+        bufferLightColour = (192, 192, 192)
+        bufferColourFlag = False
+        chessBoardDarkColour = (21,67,120)
+        chessBoardLightColour = (89,155,240)
+        chessBoardColourFlag = False
+        colour = None
         for i in range(12):
             for j in range(12):
+                # colour selection
+                squareNumber = i * 12 + j
+                if (i == 0) or (i == 11) or (j == 0) or (j == 11):
+                    if graveYardColourFlag:
+                        colour = graveYardDarkColour
+                    else:
+                        colour = graveYardLightColour
+                elif (i > 1) and (i < 10) and (j > 1) and (j < 10):
+                    if chessBoardColourFlag:
+                        colour = chessBoardDarkColour
+                    else:
+                        colour = chessBoardLightColour
+                else:
+                    if bufferColourFlag:
+                        colour = bufferDarkColour
+                    else:
+                        colour = bufferLightColour
+
                 self.__chessFadeRectangles.append(FadeRectangle(
-                    pt1=[chessBoardTopLeftX + i * sqaureWidth, chessBoardTopLeftY + j * squareHeight],
-                    pt2=[chessBoardTopLeftX + (i + 1) * sqaureWidth, chessBoardTopLeftY + (j + 1) * squareHeight],
-                    colour=(0, 0, 255), frameWidth=videoWidth,
+                    pt1=[chessBoardTopLeftX + i * sqaureWidth + squareWidthOffset, chessBoardTopLeftY + j * squareHeight + squareHeightOffset],
+                    pt2=[chessBoardTopLeftX + (i + 1) * sqaureWidth - squareWidthOffset, chessBoardTopLeftY + (j + 1) * squareHeight - squareHeightOffset],
+                    colour=colour, frameWidth=videoWidth,
                                           frameHeight=videoHeight, thickness=5, lineType=cv2.LINE_8, drawProportion=1))
+
+                graveYardColourFlag = not graveYardColourFlag
+                bufferColourFlag = not bufferColourFlag
+                chessBoardColourFlag = not chessBoardColourFlag
+
+            graveYardColourFlag = not graveYardColourFlag
+            bufferColourFlag = not bufferColourFlag
+            chessBoardColourFlag = not chessBoardColourFlag
 
         for fadeRectangle in self.__chessFadeRectangles:
             self.__allGroup.append(fadeRectangle)
 
 
-    def drawInAnimation(self):
-        drawInTime = 2
+    def drawInAnimation(self, startTime, drawInDuration):
+
         drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
-                                             startDrawProportion=0, endDrawProportion=1, startTime=0, endTime=drawInTime,
+                                             startDrawProportion=0, endDrawProportion=1, startTime=0, endTime=startTime + drawInDuration,
                                              fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
         drawAnimation.addPrimitive(self.__topRail)
         drawAnimation.addPrimitive(self.__bottomRail)
@@ -184,7 +222,7 @@ class TwoAxisRobotAndGripper:
 
 
         holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
-                                           startDrawProportion=1, endDrawProportion=1, startTime=drawInTime, endTime=self.__videoDuration,
+                                           startDrawProportion=1, endDrawProportion=1, startTime=startTime + drawInDuration, endTime=self.__videoDuration,
                                            fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
         holdAnimation.addPrimitive(self.__topRail)
         holdAnimation.addPrimitive(self.__bottomRail)
@@ -291,7 +329,7 @@ class TwoAxisRobotAndGripper:
 
 
     def toggleGripper(self, startTime, duration):
-        gripperXDelta = 0.01
+        gripperXDelta = 0.005
         gripperYDelta = gripperXDelta * (self.__videoWidth / self.__videoHeight)
         topRightAnimation = None
         bottomLeftAnimation = None
@@ -332,7 +370,7 @@ class TwoAxisRobotAndGripper:
 
         self.__gripperEngaged = not self.__gripperEngaged
 
-    def moveEntireRobot(self, startTime, xDelta, yDelta, duration):
+    def moveEntireRobot(self, startTime,  duration, xDelta, yDelta,):
 
 
         moveAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[xDelta, yDelta],
@@ -352,17 +390,16 @@ videoHeight = 2160
 fps = 30
 videoDuration = 20
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='2b-2_axis_robot_and_gripper.mp4')
+
 twoAxisRobot = TwoAxisRobotAndGripper(sceneAnimator, videoWidth, videoHeight, videoDuration)
-twoAxisRobot.drawInAnimation()
-twoAxisRobot.moveGantry(2, 1, 0, 0)
+twoAxisRobot.drawInAnimation(startTime=0, drawInDuration=2)
+twoAxisRobot.moveGantry(startTime=2, duration=2, xGantry=20, yGantry=30)
 twoAxisRobot.toggleGripper(startTime=3, duration=1)
 twoAxisRobot.moveGantry(startTime=4,duration=2,xGantry=60, yGantry=80)
 twoAxisRobot.toggleGripper(startTime=9, duration=1)
-twoAxisRobot.moveGantry(startTime=10,duration=2,xGantry=60, yGantry=60)
-twoAxisRobot.drawInChessBoard(startTime=6, boardDrawDuration=3, boardHoldDuration=2, boardSeeThroughDuration=0.5, boardSeeThroughHoldDuration=3)
-
-#twoAxisRobot.moveEntireRobot(-0.2,-0.1,1)
-#twoAxisRobot.moveEntireRobot(0,-0.1,1)
+twoAxisRobot.moveGantry(startTime=12,duration=2,xGantry=60, yGantry=60)
+twoAxisRobot.drawInChessBoard(startTime=6, boardDrawDuration=2, boardHoldDuration=2, boardSeeThroughDuration=1, boardSeeThroughHoldDuration=10)
+twoAxisRobot.moveEntireRobot(startTime=14, duration=2, xDelta=-0.25, yDelta=0.0)
 
 
 
