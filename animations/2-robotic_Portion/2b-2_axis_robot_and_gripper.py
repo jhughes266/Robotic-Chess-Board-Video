@@ -6,7 +6,8 @@ from animation_tools.scene_animation import *
 
 
 class TwoAxisRobotAndGripper:
-    def __init__(self, sceneAnimator, videoWidth, videoHeight, videoDuration):
+    def __init__(self, sceneAnimator, videoWidth, videoHeight, videoDuration, fps, moveablePieceName):
+
         self.__sceneAnimator = sceneAnimator
         self.__railTopLength = 0.35
         self.__railSideLength = videoWidth / videoHeight * self.__railTopLength
@@ -151,6 +152,51 @@ class TwoAxisRobotAndGripper:
         squareHeightOffset = squareHeight * 0.03
         self.__chessFadeRectangles = []
 
+        self.__moveablePieceImageWidth = sqaureWidth
+        squareToPiecePath = {
+            26: "black_rook",
+            27: "black_pawn",
+            32: "white_pawn",
+            33: "white_rook",
+
+            38: "black_knight",
+            39: "black_pawn",
+            44: "white_pawn",
+            45: "white_knight",
+
+            50: "black_bishop",
+            51: "black_pawn",
+            56: "white_pawn",
+            57: "white_bishop",
+
+            62: "black_queen",
+            63: "black_pawn",
+            68: "white_pawn",
+            69: "white_queen",
+
+            74: "black_king",
+            75: "black_pawn",
+            80: "white_pawn",
+            81: "white_king",
+
+            86: "black_bishop",
+            87: "black_pawn",
+            92: "white_pawn",
+            93: "white_bishop",
+
+            98: "black_knight",
+            99: "black_pawn",
+            104: "white_pawn",
+            105: "white_knight",
+
+            110: "black_rook",
+            111: "black_pawn",
+            116: "white_pawn",
+            117: "white_rook"
+        }
+
+        self.__pieces = []
+
         graveYardDarkColour = (0, 0, 255)
         graveYardLightColour = (0, 0, 125)
         graveYardColourFlag = False
@@ -161,6 +207,7 @@ class TwoAxisRobotAndGripper:
         chessBoardLightColour = (89,155,240)
         chessBoardColourFlag = False
         colour = None
+        self.__moveablePieceImage = None
         for i in range(12):
             for j in range(12):
                 # colour selection
@@ -186,6 +233,25 @@ class TwoAxisRobotAndGripper:
                     pt2=[chessBoardTopLeftX + (i + 1) * sqaureWidth - squareWidthOffset, chessBoardTopLeftY + (j + 1) * squareHeight - squareHeightOffset],
                     colour=colour, frameWidth=videoWidth,
                                           frameHeight=videoHeight, thickness=5, lineType=cv2.LINE_8, drawProportion=1))
+                currentPiecePath = None
+                if squareNumber in squareToPiecePath:
+                    piecePath = squareToPiecePath[squareNumber]
+                    path = '../resources/piece_images/' + piecePath + '.jpg'
+                    currentPiecePath = path
+                    self.__pieces.append(Image(topLeft=[chessBoardTopLeftX + i * sqaureWidth, chessBoardTopLeftY + j * squareHeight], imgPath=path,
+                                  imageWidth=sqaureWidth, colour=None, drawProportion=0, maxNumBlurs=100,
+                                  frameWidth=videoWidth, frameHeight=videoHeight, onlyKeepMonoChrome=True))
+
+                # Create moveable piece
+                moveablePiecePath = '../resources/piece_images/' + moveablePieceName + '.jpg'
+                if moveablePiecePath == currentPiecePath and self.__moveablePieceImage is None:
+                    self.__moveablePieceImage = Image(topLeft=[chessBoardTopLeftX + i * sqaureWidth, chessBoardTopLeftY + j * squareHeight], imgPath=moveablePiecePath,
+                                                      imageWidth=self.__moveablePieceImageWidth, colour=None,
+                                                      drawProportion=0,
+                                                      maxNumBlurs=100,
+                                                      frameWidth=videoWidth, frameHeight=videoHeight,
+                                                      onlyKeepMonoChrome=True)
+                    self.__allGroup.append(self.__moveablePieceImage)
 
                 graveYardColourFlag = not graveYardColourFlag
                 bufferColourFlag = not bufferColourFlag
@@ -197,6 +263,9 @@ class TwoAxisRobotAndGripper:
 
         for fadeRectangle in self.__chessFadeRectangles:
             self.__allGroup.append(fadeRectangle)
+
+        for image in self.__pieces:
+            self.__allGroup.append(image)
 
 
     def drawInAnimation(self, startTime, drawInDuration):
@@ -248,6 +317,7 @@ class TwoAxisRobotAndGripper:
 
         rectangleDrawTime = boardDrawDuration / (len(self.__chessFadeRectangles) + 1)
         rectangleVanishTime = boardSeeThroughDuration / (len(self.__chessFadeRectangles) + 1)
+        pieceVanishTime = None
         for i, fadeRectangle in enumerate(self.__chessFadeRectangles):
 
             boardConstruction = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0, 0],
@@ -269,7 +339,7 @@ class TwoAxisRobotAndGripper:
 
             boardSeeThroughStartTime = startTime + boardDrawDuration + boardHoldDuration
             boardSeeThroughEndTime = max(boardSeeThroughStartTime + .2, boardSeeThroughStartTime + (i + 1) * rectangleVanishTime)
-
+            pieceVanishTime = boardSeeThroughEndTime
             seeThroughBoard = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0, 0],
                                            startDrawProportion=1, endDrawProportion=0.5,
                                            startTime=boardSeeThroughStartTime,
@@ -285,6 +355,38 @@ class TwoAxisRobotAndGripper:
                                                  fps=fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
             seeThroughBoardHold.addPrimitive(fadeRectangle)
             self.__sceneAnimator.addPrimitiveAnimation(seeThroughBoardHold)
+
+        pieceDraw = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0, 0],
+                                       startDrawProportion=0,
+                                       endDrawProportion=1,
+                                       startTime=startTime + boardDrawDuration,
+                                       endTime=startTime + boardDrawDuration + boardHoldDuration / 2,
+                                       fps=fps, frameWidth=self.__videoWidth,
+                                       frameHeight=self.__videoHeight)
+
+        pieceHold = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0, 0],
+                                       startDrawProportion=1,
+                                       endDrawProportion=1,
+                                       startTime=startTime + boardDrawDuration + boardHoldDuration / 2,
+                                       endTime=startTime + boardDrawDuration + boardHoldDuration ,
+                                       fps=fps, frameWidth=self.__videoWidth,
+                                       frameHeight=self.__videoHeight)
+        pieceVanish = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0, 0],
+                                       startDrawProportion=1,
+                                       endDrawProportion=0,
+                                       startTime=startTime + boardDrawDuration + boardHoldDuration,
+                                       endTime=pieceVanishTime + (pieceVanishTime - (startTime + boardDrawDuration + boardHoldDuration))/2,
+                                       fps=fps, frameWidth=self.__videoWidth,
+                                       frameHeight=self.__videoHeight)
+        for piece in self.__pieces:
+            pieceDraw.addPrimitive(piece)
+            pieceHold.addPrimitive(piece)
+            pieceVanish.addPrimitive(piece)
+        self.__sceneAnimator.addPrimitiveAnimation(pieceDraw)
+        self.__sceneAnimator.addPrimitiveAnimation(pieceHold)
+        self.__sceneAnimator.addPrimitiveAnimation(pieceVanish)
+
+
 
 
 
@@ -383,23 +485,55 @@ class TwoAxisRobotAndGripper:
             moveAnimation.addPrimitive(primitive)
         self.__sceneAnimator.addPrimitiveAnimation(moveAnimation)
 
+    def drawInMoveablePiece(self, startTime, duration):
+
+
+        pieceDraw = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0, 0],
+                                       startDrawProportion=0,
+                                       endDrawProportion=1,
+                                       startTime=startTime,
+                                       endTime=startTime + duration,
+                                       fps=fps, frameWidth=self.__videoWidth,
+                                       frameHeight=self.__videoHeight)
+
+        pieceDraw.addPrimitive(self.__moveablePieceImage)
+        self.__sceneAnimator.addPrimitiveAnimation(pieceDraw)
+
 
 
 videoWidth = 3840
 videoHeight = 2160
 fps = 30
-videoDuration = 20
+videoDuration = 25
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='2b-2_axis_robot_and_gripper.mp4')
 
-twoAxisRobot = TwoAxisRobotAndGripper(sceneAnimator, videoWidth, videoHeight, videoDuration)
-twoAxisRobot.drawInAnimation(startTime=0, drawInDuration=2)
-twoAxisRobot.moveGantry(startTime=2, duration=2, xGantry=20, yGantry=30)
-twoAxisRobot.toggleGripper(startTime=3, duration=1)
-twoAxisRobot.moveGantry(startTime=4,duration=2,xGantry=60, yGantry=80)
-twoAxisRobot.toggleGripper(startTime=9, duration=1)
-twoAxisRobot.moveGantry(startTime=12,duration=2,xGantry=60, yGantry=60)
-twoAxisRobot.drawInChessBoard(startTime=6, boardDrawDuration=2, boardHoldDuration=2, boardSeeThroughDuration=1, boardSeeThroughHoldDuration=10)
-twoAxisRobot.moveEntireRobot(startTime=14, duration=2, xDelta=-0.25, yDelta=0.0)
+twoAxisRobot = TwoAxisRobotAndGripper(sceneAnimator, videoWidth, videoHeight, videoDuration, fps, moveablePieceName='white_rook')
+# Draw in the gantry
+twoAxisRobot.drawInAnimation(startTime=0, drawInDuration=1)
+# Gantry movement
+twoAxisRobot.moveGantry(startTime=1, duration=2, xGantry=60, yGantry=60)
+twoAxisRobot.moveGantry(startTime=3, duration=1, xGantry=20, yGantry=60)
+twoAxisRobot.moveGantry(startTime=4, duration=1, xGantry=60, yGantry=60)
+twoAxisRobot.moveGantry(startTime=5, duration=1, xGantry=60, yGantry=20)
+twoAxisRobot.moveGantry(startTime=6, duration=1, xGantry=60, yGantry=60)
+twoAxisRobot.moveGantry(startTime=7, duration=1, xGantry=90, yGantry=30)
+twoAxisRobot.moveGantry(startTime=8, duration=1, xGantry=60, yGantry=60)
+# Gantry movement under the board
+twoAxisRobot.moveGantry(startTime=14, duration=1, xGantry=90, yGantry=40)
+twoAxisRobot.moveGantry(startTime=15, duration=1, xGantry=70, yGantry=60)
+# Move entire chess board to allow showing of the gripper
+twoAxisRobot.moveEntireRobot(startTime=16, duration=2, xDelta=-0.25, yDelta=0.0)
+twoAxisRobot.moveGantry(startTime=20, duration=1, xGantry=20, yGantry=80)
+twoAxisRobot.moveGantry(startTime=21, duration=1, xGantry=60, yGantry=60)
+# Gripper Toggle
+twoAxisRobot.toggleGripper(startTime=18, duration=1)
+twoAxisRobot.toggleGripper(startTime=19, duration=1)
+# Drawing in the moveable piece
+twoAxisRobot.drawInMoveablePiece(startTime=18, duration=1)
+# Fade in chess board
+twoAxisRobot.drawInChessBoard(startTime=9, boardDrawDuration=2, boardHoldDuration=2, boardSeeThroughDuration=1, boardSeeThroughHoldDuration=7)
+
+
 
 
 
