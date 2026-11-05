@@ -375,7 +375,7 @@ class TwoAxisRobotAndGripper:
                                        startDrawProportion=1,
                                        endDrawProportion=0,
                                        startTime=startTime + boardDrawDuration + boardHoldDuration,
-                                       endTime=pieceVanishTime + (pieceVanishTime - (startTime + boardDrawDuration + boardHoldDuration))/2,
+                                       endTime=startTime + boardDrawDuration + boardHoldDuration + 0.1,
                                        fps=fps, frameWidth=self.__videoWidth,
                                        frameHeight=self.__videoHeight)
         for piece in self.__pieces:
