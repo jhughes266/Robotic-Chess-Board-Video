@@ -513,7 +513,7 @@ class TwoAxisRobotAndGripper:
         self.__sceneAnimator.addPrimitiveAnimation(pieceDraw)
 
 class SideOnGripper:
-    def __init__(self, sceneAnimator, xTopLeft, yTopLeft, scale, videoWidth, videoHeight):
+    def __init__(self, sceneAnimator, xTopLeft, yTopLeft, scale, videoWidth, videoHeight, pieceName):
         self.__sceneAnimator = sceneAnimator
         clawLegnth = 0.025 * scale
         clawHeightDiff = 0.01 * scale
@@ -526,18 +526,32 @@ class SideOnGripper:
         yClawSupportToBase = xClawSupportToRaiser * videoWidth / videoHeight
 
 
+        chessBoardLength = clawSupportBaseLength * 4
+
+        self.__clawSupportLength = clawSupportLength
+        self.__raiserLength = raiserLength
+        self.__gripperEngaged = False
+
+        self.__verticalY = self.__clawSupportLength * 0.3
+        self.__clawX = self.__raiserLength * 0.1
+        chessBoardVerticalOffset = 0.01
+
+        imageWidth = 0.8 * clawSupportBaseLength
+        # Assumes square image
+        imageHeight = imageWidth * (videoWidth / videoHeight)
+
         self.__leftClaw = Line(pt1=[xTopLeft, yTopLeft],
                                pt2=[xTopLeft + clawLegnth, yTopLeft],
-                               colour=(255, 255, 255), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
+                               colour=(0, 255, 0), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
         self.__rightClaw = Line(pt1=[xTopLeft + clawSupportBaseLength, yTopLeft - clawHeightDiff],
                                pt2=[xTopLeft + clawSupportBaseLength - clawLegnth, yTopLeft - clawHeightDiff],
-                               colour=(255, 255, 255), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
+                               colour=(0, 0, 255), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
         self.__leftClawSupport = Line(pt1=[xTopLeft, yTopLeft],
                                pt2=[xTopLeft, yTopLeft + clawSupportLength],
-                               colour=(255, 255, 255), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
+                               colour=(0, 255, 0), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
         self.__rightClawSupport = Line(pt1=[xTopLeft + clawSupportBaseLength, yTopLeft  - clawHeightDiff],
                                pt2=[xTopLeft + clawSupportBaseLength, yTopLeft + clawSupportLength],
-                               colour=(255, 255, 255), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
+                               colour=(0, 0, 255), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
         self.__clawSupportBase = Line(pt1=[xTopLeft, yTopLeft + clawSupportLength],
                                pt2=[xTopLeft + clawSupportBaseLength, yTopLeft + clawSupportLength],
                                colour=(255, 255, 255), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
@@ -557,9 +571,41 @@ class SideOnGripper:
                                pt2=[xTopLeft + clawSupportBaseLength/2 + xClawSupportToRaiser, yTopLeft + clawSupportLength + yClawSupportToBase + yBaseLength],
                                colour=(255, 255, 255), thickness=5, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
 
+
+        self.__allGripperGroup = [self.__leftClaw, self.__rightClaw, self.__leftClawSupport, self.__rightClawSupport, self.__clawSupportBase, self.__raiser, self.__leftBaseHorizontal, self.__rightBaseHorizontal, self.__leftBaseVertical, self.__rightBaseVertical]
+
+        self.__verticalGroup = [self.__leftClaw, self.__rightClaw, self.__leftClawSupport, self.__rightClawSupport, self.__clawSupportBase, self.__raiser]
+        self.__leftClawGroup = [self.__leftClaw, self.__leftClawSupport]
+        self.__rightClawGroup = [self.__rightClaw, self.__rightClawSupport]
+        # Chess board
+        self.__chessBoard = Line(pt1=[xTopLeft, yTopLeft - self.__verticalY - clawHeightDiff - chessBoardVerticalOffset],
+                               pt2=[xTopLeft + chessBoardLength, yTopLeft - self.__verticalY - clawHeightDiff - chessBoardVerticalOffset],
+                               colour=(255, 255, 255), thickness=15, drawProportion=0,frameWidth=videoWidth, frameHeight=videoHeight)
+        # Chess piece
+        path = '../resources/piece_images/' + pieceName + '.jpg'
+        chessPieceHeightOffset = imageHeight * 0.1
+        chessPieceX = xTopLeft + clawSupportBaseLength / 2 - imageWidth /2 + 0.05
+        self.__chessPiece = Image(topLeft=[chessPieceX, yTopLeft - self.__verticalY - clawHeightDiff - chessBoardVerticalOffset - imageHeight + chessPieceHeightOffset],
+                                  imgPath=path,
+                                  imageWidth=imageWidth, colour=None, drawProportion=0, maxNumBlurs=100,
+                                  frameWidth=videoWidth, frameHeight=videoHeight, onlyKeepMonoChrome=True)
+
+        magnetWidth = imageWidth * 0.2
+        magentHeight = imageHeight * 0.2
+        self.__topMagnet = Rectangle(pt1=[chessPieceX + imageWidth / 2 - magnetWidth / 2, yTopLeft - self.__verticalY - clawHeightDiff - chessBoardVerticalOffset - magentHeight],
+                                     pt2=[chessPieceX + imageWidth / 2 - magnetWidth / 2 + magnetWidth, yTopLeft - self.__verticalY - clawHeightDiff - chessBoardVerticalOffset],
+                                     colour=(95, 95, 95), thickness=-40, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        self.__bottomMagnet = Rectangle(pt1=[chessPieceX + imageWidth / 2 - magnetWidth / 2,yTopLeft - self.__verticalY - clawHeightDiff - chessBoardVerticalOffset],
+                                         pt2=[chessPieceX + imageWidth / 2 - magnetWidth / 2 + magnetWidth, yTopLeft - self.__verticalY - clawHeightDiff - chessBoardVerticalOffset + magentHeight],
+                                     colour=(95, 95, 95), thickness=-40, drawProportion=0, frameWidth=videoWidth,
+                                     frameHeight=videoHeight)
+
+        self.__chessPieceGroup = [self.__chessPiece, self.__topMagnet, self.__bottomMagnet]
+
     def drawInAnimation(self, startTime, drawDuration, holdDuration):
         drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
-                                           startDrawProportion=0, endDrawProportion=1, startTime=0,
+                                           startDrawProportion=0, endDrawProportion=1, startTime=startTime,
                                            endTime=startTime + drawDuration,
                                            fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
         drawAnimation.addPrimitive(self.__leftClaw)
@@ -591,10 +637,208 @@ class SideOnGripper:
         holdAnimation.addPrimitive(self.__rightBaseVertical)
         self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
 
+    def toggle(self, startTime, verticalDuration, clawCloseDuration, holdDuration):
+
+        if self.__gripperEngaged:
+            nonClawHoldHold = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                 startDrawProportion=1, endDrawProportion=1,
+                                                 startTime=startTime,
+                                                 endTime=startTime + clawCloseDuration,
+                                                 fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+            for primitive in self.__allGripperGroup:
+                if (primitive not in self.__leftClawGroup):
+                    if (primitive not in self.__rightClawGroup):
+                        nonClawHoldHold.addPrimitive(primitive)
+
+            rightClawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[self.__clawX, 0.0],
+                                                    startDrawProportion=1, endDrawProportion=1,
+                                                    startTime=startTime,
+                                                    endTime=startTime + clawCloseDuration,
+                                                    fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+            for primitive in self.__rightClawGroup:
+                rightClawAnimation.addPrimitive(primitive)
+
+            leftClawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[-self.__clawX, 0.0],
+                                                   startDrawProportion=1, endDrawProportion=1,
+                                                   startTime=startTime,
+                                                   endTime=startTime + clawCloseDuration,
+                                                   fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+            for primitive in self.__leftClawGroup:
+                leftClawAnimation.addPrimitive(primitive)
+
+            nonVerticalHold = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                 startDrawProportion=1, endDrawProportion=1,
+                                                 startTime=startTime + clawCloseDuration,
+                                                 endTime=startTime + clawCloseDuration+ verticalDuration,
+                                                 fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+            for primitive in self.__allGripperGroup:
+                if primitive not in self.__verticalGroup:
+                    nonVerticalHold.addPrimitive(primitive)
+
+            verticalAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, self.__verticalY],
+                                                   startDrawProportion=1, endDrawProportion=1,
+                                                   startTime=startTime + clawCloseDuration,
+                                                   endTime=startTime + clawCloseDuration + verticalDuration,
+                                                   fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+            for primitive in self.__verticalGroup:
+                verticalAnimation.addPrimitive(primitive)
+
+            holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                               startDrawProportion=1, endDrawProportion=1,
+                                               startTime = startTime + clawCloseDuration + verticalDuration,
+                                               endTime= startTime + clawCloseDuration + verticalDuration + holdDuration,
+                                               fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+            for primitive in self.__allGripperGroup:
+                holdAnimation.addPrimitive(primitive)
+
+        else:
+            nonVerticalHold = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                 startDrawProportion=1, endDrawProportion=1,
+                                                 startTime=startTime,
+                                                 endTime=startTime + verticalDuration,
+                                                 fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+            for primitive in self.__allGripperGroup:
+                if primitive not in self.__verticalGroup:
+                    nonVerticalHold.addPrimitive(primitive)
+
+            verticalAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, -self.__verticalY],
+                                               startDrawProportion=1, endDrawProportion=1,
+                                               startTime=startTime,
+                                               endTime=startTime + verticalDuration,
+                                               fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+            for primitive in self.__verticalGroup:
+                verticalAnimation.addPrimitive(primitive)
+
+            nonClawHoldHold = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                 startDrawProportion=1, endDrawProportion=1,
+                                                 startTime=startTime + verticalDuration,
+                                                 endTime=startTime + verticalDuration + clawCloseDuration,
+                                                 fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+            for primitive in self.__allGripperGroup:
+                if (primitive not in self.__leftClawGroup):
+                    if (primitive not in self.__rightClawGroup):
+                        nonClawHoldHold.addPrimitive(primitive)
 
 
-    def moveEntireGripper(self, xDelta, yDelta):
-        pass
+            leftClawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[self.__clawX, 0.0],
+                                               startDrawProportion=1, endDrawProportion=1,
+                                               startTime=startTime + verticalDuration,
+                                               endTime=startTime + verticalDuration + clawCloseDuration,
+                                               fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+            for primitive in self.__leftClawGroup:
+                leftClawAnimation.addPrimitive(primitive)
+
+            rightClawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[-self.__clawX, 0.0],
+                                                   startDrawProportion=1, endDrawProportion=1,
+                                                    startTime=startTime + verticalDuration,
+                                                    endTime=startTime + verticalDuration + clawCloseDuration,
+                                                   fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+            for primitive in self.__rightClawGroup:
+                rightClawAnimation.addPrimitive(primitive)
+
+            holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                               startDrawProportion=1, endDrawProportion=1,
+                                               startTime=startTime + verticalDuration + clawCloseDuration,
+                                               endTime=startTime + verticalDuration + clawCloseDuration + holdDuration,
+                                               fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+            for primitive in self.__allGripperGroup:
+                holdAnimation.addPrimitive(primitive)
+
+        self.__sceneAnimator.addPrimitiveAnimation(nonVerticalHold)
+        self.__sceneAnimator.addPrimitiveAnimation(verticalAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(nonClawHoldHold)
+        self.__sceneAnimator.addPrimitiveAnimation(leftClawAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(rightClawAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
+
+        self.__gripperEngaged = not self.__gripperEngaged
+
+    def drawInPiece(self, startTime, drawDuration, holdDuration):
+        drawChessPiece = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=0, endDrawProportion=1,
+                                           startTime=startTime,
+                                           endTime=startTime + drawDuration,
+                                           fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        holdChessPiece = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=1, endDrawProportion=1,
+                                           startTime=startTime + drawDuration,
+                                           endTime=startTime + drawDuration + holdDuration,
+                                           fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        drawChessPiece.addPrimitive(self.__chessPiece)
+        drawChessPiece.addPrimitive(self.__topMagnet)
+        drawChessPiece.addPrimitive(self.__bottomMagnet)
+        holdChessPiece.addPrimitive(self.__chessPiece)
+        holdChessPiece.addPrimitive(self.__topMagnet)
+        holdChessPiece.addPrimitive(self.__bottomMagnet)
+        self.__sceneAnimator.addPrimitiveAnimation(drawChessPiece)
+        self.__sceneAnimator.addPrimitiveAnimation(holdChessPiece)
+
+
+    def drawChessBoard(self, startTime, drawDuration, holdDuration):
+        drawChessBoardAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=0, endDrawProportion=1,
+                                           startTime=startTime,
+                                           endTime=startTime + drawDuration,
+                                           fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                     startDrawProportion=1, endDrawProportion=1,
+                                                     startTime=startTime + drawDuration,
+                                                     endTime=startTime + drawDuration + holdDuration,
+                                                     fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        drawChessBoardAnimation.addPrimitive(self.__chessBoard)
+        holdAnimation.addPrimitive(self.__chessBoard)
+        self.__sceneAnimator.addPrimitiveAnimation(drawChessBoardAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
+
+    def moveGripper(self, startTime, xDelta, moveDuration, holdDuration):
+        moveGripperAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[xDelta, 0.0],
+                                                     startDrawProportion=1, endDrawProportion=1,
+                                                     startTime=startTime ,
+                                                     endTime=startTime + moveDuration ,
+                                                     fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        holdGripperAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                     startDrawProportion=1, endDrawProportion=1,
+                                                     startTime=startTime + moveDuration,
+                                                     endTime=startTime + moveDuration + holdDuration,
+                                                     fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+        for primitive in self.__allGripperGroup:
+            moveGripperAnimation.addPrimitive(primitive)
+            holdGripperAnimation.addPrimitive(primitive)
+
+        self.__sceneAnimator.addPrimitiveAnimation(moveGripperAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdGripperAnimation)
+
+    def movePiece(self, startTime, xDelta, moveDuration, holdDuration):
+        movePieceAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[xDelta, 0.0],
+                                                  startDrawProportion=1, endDrawProportion=1,
+                                                  startTime=startTime,
+                                                  endTime=startTime + moveDuration,
+                                                  fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        holdPieceAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                  startDrawProportion=1, endDrawProportion=1,
+                                                  startTime=startTime + moveDuration,
+                                                  endTime=startTime + moveDuration + holdDuration,
+                                                  fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+        for primitive in self.__chessPieceGroup:
+            movePieceAnimation.addPrimitive(primitive)
+            holdPieceAnimation.addPrimitive(primitive)
+
+        self.__sceneAnimator.addPrimitiveAnimation(movePieceAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdPieceAnimation)
 
 
 
@@ -604,8 +848,35 @@ videoHeight = 2160
 fps = 30
 videoDuration = 30
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='2b-2_axis_robot_and_gripper.mp4')
-sideOnGripper = SideOnGripper(sceneAnimator=sceneAnimator, xTopLeft=0.8, yTopLeft=0.4, scale=1, videoWidth=videoWidth, videoHeight=videoHeight)
-sideOnGripper.drawInAnimation(startTime=0, drawDuration=1, holdDuration=29)
+
+# Gripper Animation
+sideOnGripper = SideOnGripper(sceneAnimator=sceneAnimator, xTopLeft=0.6, yTopLeft=0.4, scale=1.5, videoWidth=videoWidth, videoHeight=videoHeight, pieceName='white_rook')
+
+gripperOffset = 13
+sideOnGripper.drawInAnimation(startTime=gripperOffset + 0, drawDuration=1, holdDuration=1)
+sideOnGripper.toggle(startTime=gripperOffset + 2, verticalDuration=0.5, clawCloseDuration=0.5, holdDuration=1)
+sideOnGripper.toggle(startTime=gripperOffset + 4, verticalDuration=0.5, clawCloseDuration=0.5, holdDuration=videoDuration)
+
+
+sideOnGripper.drawInPiece(startTime=gripperOffset + 6, drawDuration=1, holdDuration=videoDuration)
+sideOnGripper.movePiece(startTime=gripperOffset + 9,xDelta=0.1 , moveDuration=2, holdDuration=videoDuration)
+
+sideOnGripper.moveGripper(startTime=gripperOffset + 7,xDelta=0.05 , moveDuration=1, holdDuration=videoDuration)
+
+sideOnGripper.toggle(startTime=gripperOffset + 8, verticalDuration=0.5, clawCloseDuration=0.5, holdDuration=videoDuration)
+
+sideOnGripper.moveGripper(startTime=gripperOffset + 9,xDelta=0.1 , moveDuration=2, holdDuration=videoDuration)
+
+
+sideOnGripper.toggle(startTime=gripperOffset + 11, verticalDuration=0.5, clawCloseDuration=0.5, holdDuration=videoDuration)
+
+sideOnGripper.moveGripper(startTime=gripperOffset + 12,xDelta=0.075 , moveDuration=1, holdDuration=videoDuration)
+
+sideOnGripper.drawChessBoard(startTime=gripperOffset + 6, drawDuration=1, holdDuration=videoDuration)
+
+
+
+
 
 twoAxisRobot = TwoAxisRobotAndGripper(sceneAnimator, videoWidth, videoHeight, videoDuration, fps, moveablePieceName='white_rook')
 # Draw in the gantry
