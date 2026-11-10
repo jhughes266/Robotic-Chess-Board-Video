@@ -69,6 +69,33 @@ class Line(PrimitiveElement):
                  thickness=self._thickness,
                  lineType=self._lineType)
 
+class FilledPolygon(PrimitiveElement):
+    def __init__(self, pts, colour, frameWidth, frameHeight, backgroundColour = (0,0,0), drawProportion=1):
+        super().__init__(position=pts[0], colour=colour, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
+        self.__pts = []
+        self.__backgroundColour = backgroundColour
+        for i, pt in enumerate(pts):
+            self.__pts.append(self._toPixel([float(pt[0]), float(pt[1])]))
+
+        self.__pts = np.array(self.__pts, dtype=np.int64)
+
+
+    def updatePosition(self, delta):
+        for pt in self.__pts:
+            pt[0] += delta[0]
+            pt[1] += delta[1]
+
+
+
+    def draw(self, frame):
+        if self._drawProportion == 0:
+            return
+        colourDif = np.array(self._colour) - np.array(self.__backgroundColour)
+        colourDrawProp = colourDif * self._drawProportion
+        currentColour = tuple(np.array(self.__backgroundColour) + colourDrawProp)
+        currentColour = (int(currentColour[0]), int(currentColour[1]), int(currentColour[2]))
+        cv2.fillPoly(img=frame, pts=[self.__pts], color=currentColour)
+
 class ArrowedLine(Line):
     def __init__(self, pt1, pt2, colour, frameWidth, frameHeight, thickness=1, lineType=8, drawProportion=1):
         super().__init__(pt1=pt1, pt2=pt2, colour=colour, thickness=thickness, lineType=lineType, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
