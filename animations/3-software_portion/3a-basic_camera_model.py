@@ -237,6 +237,32 @@ class CameraModel:
         self.__sceneAnimator.addPrimitiveAnimation(drawAnimation)
         self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
 
+    def moveCamera(self, startTime,  duration, xDelta, yDelta):
+
+
+        moveAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[xDelta, yDelta],
+                                        startDrawProportion=1, endDrawProportion=1,
+                                        startTime=startTime,
+                                        endTime=startTime + duration,
+                                        fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+        for primitive in self.__panelPrimitiveOutlineList:
+            moveAnimation.addPrimitive(primitive)
+
+        for primitive in self.__panelPrimitiveGridList:
+            moveAnimation.addPrimitive(primitive)
+
+        for primitive in self.__panelPrimitivePixelsGridList:
+            moveAnimation.addPrimitive(primitive)
+
+        for primitive in self.__lineThroughAperturePrimitiveList:
+            moveAnimation.addPrimitive(primitive)
+
+        for primitive in self.__aperturePrimitiveList:
+            moveAnimation.addPrimitive(primitive)
+
+        self.__sceneAnimator.addPrimitiveAnimation(moveAnimation)
+
 class Stylus:
     def __init__(self, sceneAnimator, xBottomLeft, yBottomLeft, greenTipXLength, greenTipYLength, whiteHandleYLength, videoWidth, videoHeight):
         self.__sceneAnimator = sceneAnimator
@@ -338,7 +364,7 @@ class Stylus:
 videoWidth = 3840
 videoHeight = 2160
 fps = 30
-videoDuration = 10
+videoDuration = 15
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='3a-basic_camera_model.mp4')
 cameraImage = [[[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
 [[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
@@ -354,10 +380,14 @@ stylus = Stylus(sceneAnimator=sceneAnimator, xBottomLeft=0.5, yBottomLeft=0.5, g
 
 stylus.drawInStylusTipAndHandle(startTime=0, drawDuration=2, holdDuration=videoDuration)
 stylus.drawInStylusLeftTip(startTime=2.1, drawDuration=.1, holdDuration=videoDuration)
-cameraModel.drawInLinesThroughAperture(startTime=0, drawDuration=8, holdDuration=1)
-cameraModel.drawInPixels(startTime=4, drawDuration=1, holdDuration=videoDuration)
+
+cameraModel.drawInLinesThroughAperture(startTime=0, drawDuration=8, holdDuration=videoDuration)
+cameraModel.drawInPixels(startTime=4, drawDuration=1, holdDuration=5)
 cameraModel.drawInAperture(startTime=0, drawDuration=1, holdDuration=videoDuration)
 cameraModel.drawInSensorPanel(startTime=0, drawDuration=1, holdDuration=videoDuration)
+
+cameraModel.moveCamera(startTime=10, duration=2, xDelta=0.0, yDelta=0.1)
+
 
 
 stylus.drawInStylusRightTip(startTime=2.1, drawDuration=.1, holdDuration=videoDuration)

@@ -71,7 +71,7 @@ class Line(PrimitiveElement):
 
 class FilledPolygon(PrimitiveElement):
     def __init__(self, pts, colour, frameWidth, frameHeight, backgroundColour = (0,0,0), drawProportion=1):
-        super().__init__(position=pts[0], colour=colour, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
+        super().__init__(position=[0,0], colour=colour, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
         self.__pts = []
         self.__backgroundColour = backgroundColour
         for i, pt in enumerate(pts):
@@ -84,8 +84,6 @@ class FilledPolygon(PrimitiveElement):
         for pt in self.__pts:
             pt[0] += delta[0]
             pt[1] += delta[1]
-
-
 
     def draw(self, frame):
         if self._drawProportion == 0:
@@ -250,7 +248,57 @@ class FadeRectangle(PrimitiveElement):
                           thickness=self.__thickness,
                           lineType=self.__lineType)
 
+class ColourChangeRectangle(PrimitiveElement):
+    def __init__(self, pt1, pt2, firstColour, secondColour, thirdColour, frameWidth, frameHeight, thickness=1, lineType=cv2.LINE_8, drawProportion=1, backgroundColour = (0,0,0)):
+        super().__init__(position=pt1, colour=firstColour, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
+        self.__pt2 = self._toPixel(pt2)
+        self.__secondColour = secondColour
+        self.__thirdColour = thirdColour
+        self.__thickness = thickness
+        self.__lineType = lineType
+        self.__backgroundColour = backgroundColour
 
+    def updatePosition(self, delta):
+        self._position[0] += delta[0]
+        self._position[1] += delta[1]
+
+        self.__pt2[0]  += delta[0]
+        self.__pt2[1] += delta[1]
+
+    def draw(self, frame):
+        pt1 = self._position
+        pt2 = self.__pt2
+        if self._drawProportion <= 0.333:
+            tempDrawProportion = self._drawProportion / 0.333
+            colourDiff = np.array(self._colour) - np.array(self.__backgroundColour)
+            currentColour = tuple(np.array(self.__backgroundColour) + tempDrawProportion * colourDiff)
+            cv2.rectangle(img=frame,
+                          pt1=(int(pt1[0]), int(pt1[1])),
+                          pt2=(int(pt2[0]), int(pt2[1])),
+                          color=currentColour,
+                          thickness=self.__thickness,
+                          lineType=self.__lineType)
+
+        elif self._drawProportion <= 0.666:
+            tempDrawProportion = (self._drawProportion - 0.333) / 0.333
+            colourDiff = np.array(self.__secondColour) - np.array(self._colour)
+            currentColour = tuple(np.array(self._colour) + tempDrawProportion * colourDiff)
+            cv2.rectangle(img=frame,
+                          pt1=(int(pt1[0]), int(pt1[1])),
+                          pt2=(int(pt2[0]), int(pt2[1])),
+                          color=currentColour,
+                          thickness=self.__thickness,
+                          lineType=self.__lineType)
+        else:
+            tempDrawProportion = (self._drawProportion - 0.666) / 0.333
+            colourDiff = np.array(self.__thirdColour) - np.array(self.__secondColour)
+            currentColour = tuple(np.array(self.__secondColour) + tempDrawProportion * colourDiff)
+            cv2.rectangle(img=frame,
+                          pt1=(int(pt1[0]), int(pt1[1])),
+                          pt2=(int(pt2[0]), int(pt2[1])),
+                          color=currentColour,
+                          thickness=self.__thickness,
+                          lineType=self.__lineType)
 
 class Ellipse(PrimitiveElement):
     def __init__(self, center, axes, angle, startAngle, endAngle, colour, frameWidth, frameHeight, thickness=1, lineType=cv2.LINE_8, drawProportion=1):
