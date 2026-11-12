@@ -69,6 +69,57 @@ class Line(PrimitiveElement):
                  thickness=self._thickness,
                  lineType=self._lineType)
 
+class DashedLine(PrimitiveElement):
+    def __init__(self, pt1, pt2, colour, frameWidth, frameHeight, thickness=1, lineType=cv2.LINE_8, drawProportion=1, dashLength=10):
+        super().__init__(position=pt1, colour=colour, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
+        self._pt2 = self._toPixel(pt2)
+        self._thickness = thickness
+        self._lineType = lineType
+        self._dashLength = dashLength
+
+    def updatePosition(self, delta):
+        self._position[0] += delta[0]
+        self._position[1] += delta[1]
+
+        self._pt2[0]  += delta[0]
+        self._pt2[1] += delta[1]
+
+    def draw(self, frame):
+        if self._drawProportion == 0:
+            return
+        pt1 = copy.deepcopy(self._position)
+        pt2 = copy.deepcopy(self._pt2)
+
+        fullOpposite = pt2[0] - pt1[0]
+        fullAdjacent = pt2[1] - pt1[1]
+        fullHypotenuse = math.sqrt((fullOpposite) ** 2 + (fullAdjacent) ** 2)
+
+        propHypotenuse = fullHypotenuse * self._drawProportion
+        propOpposite = propHypotenuse * (fullOpposite / fullHypotenuse)
+        propAdjacent = propHypotenuse * (fullAdjacent / fullHypotenuse)
+
+        pt2[0] = pt1[0] + propOpposite
+        pt2[1] = pt1[1] + propAdjacent
+
+        numberOfDashes = int(propHypotenuse / self._dashLength)
+        dashA = self._dashLength * (fullAdjacent/ fullHypotenuse)
+        dashO = self._dashLength * (fullOpposite / fullHypotenuse)
+        for i in range(numberOfDashes):
+            if i % 2 != 0:
+                continue
+            dashTopX = pt1[0] + i * dashO
+            dashTopY = pt1[1] + i * dashA
+
+            dashBottomX = pt1[0] + (i + 1) * dashO
+            dashBottomY = pt1[1] + (i + 1) * dashA
+
+            cv2.line(img=frame,
+                 pt1=(int(dashTopX), int(dashTopY)),
+                 pt2=(int(dashBottomX), int(dashBottomY)),
+                 color=self._colour,
+                 thickness=self._thickness,
+                 lineType=self._lineType)
+
 class FilledPolygon(PrimitiveElement):
     def __init__(self, pts, colour, frameWidth, frameHeight, backgroundColour = (0,0,0), drawProportion=1):
         super().__init__(position=[0,0], colour=colour, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
@@ -333,7 +384,7 @@ class Ellipse(PrimitiveElement):
                     lineType=self.__lineType)
 
 class Text(PrimitiveElement):
-    def __init__(self, text, org, fontFace, fontScale, colour, frameWidth, frameHeight,  backgroundColour=(0,0,0), thickness=1, lineType=cv2.LINE_8, drawProportion=1, progressiveDrawMode='enlarge', insertCursorThickness=1):
+    def __init__(self, text, org, fontFace, fontScale, colour, frameWidth, frameHeight,  backgroundColour=(0,0,0), thickness=1, lineType=cv2.LINE_8, drawProportion=1, progressiveDrawMode='enlarge', insertCursorThickness=1, drawOverElementsBehind=False):
         super().__init__(position=org,colour=colour, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
         self.__text = text
         self.__fontFace = fontFace
@@ -343,6 +394,7 @@ class Text(PrimitiveElement):
         self.__lineType = lineType
         self.__progressiveDrawMode = progressiveDrawMode
         self.__insertCursorThickness = insertCursorThickness
+        self.__drawOverElementsBehind = drawOverElementsBehind
 
     def updatePosition(self, delta):
         self._position[0] += delta[0]
@@ -380,6 +432,15 @@ class Text(PrimitiveElement):
 
             org[0] -= textWidth / 2
             org[1] += textHeight / 2
+
+            if self.__drawOverElementsBehind:
+                # + 3 is a small offset
+                cv2.rectangle(img=frame,
+                              pt1=(int(org[0]), int(org[1]) - textHeight),
+                              pt2=(int(org[0]) + textWidth, int(org[1]) + 3),
+                              color=self.__backgroundColour,
+                              thickness=-1,
+                              lineType=self.__lineType)
 
             cv2.putText(img=frame,
                         text=self.__text,

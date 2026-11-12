@@ -4,9 +4,10 @@ from animation_tools.scene_animation import *
 import math
 
 class BranchInfo:
-    def __init__(self, branchText, branchLineType):
+    def __init__(self, branchText, branchLineType, textPositionProportion):
         self.branchText = branchText
         self.branchLineType = branchLineType
+        self.textPositionProportion = textPositionProportion
 
 class SmallDemoBoard:
     def __init__(self, sceneAnimator, x, y, squareWidth, pieceLayout, text, branchInfoList, horizontalSpacingBetweenLines, verticalSpacingBetweenBoards, videoWidth, videoHeight):
@@ -78,7 +79,7 @@ class SmallDemoBoard:
                                                      imageWidth=self.__squareWidth,
                                                      colour=None, drawProportion=0, maxNumBlurs=100,frameWidth=videoWidth, frameHeight=videoHeight, onlyKeepMonoChrome=True))
 
-        # Branches
+        # Branches and branch text
         self.__branchesPrimitives = []
         branchXOrigin = self.__x
         branchYOrigin = self.__y + 1.5 * self.__squareHeight
@@ -92,10 +93,25 @@ class SmallDemoBoard:
 
         for i, branchInfo in enumerate(self.__branchInfoList):
             branchXdestination = startXdestination + i * horizontalSpacingBetweenLines
-            self.__branchesPrimitives.append(Line(
-                 pt1=[branchXOrigin, branchYOrigin],
-                 pt2=[branchXdestination, branchYdestination],
-                 colour=(255, 255, 255), thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight))
+            # Branching lines
+            if branchInfo.branchLineType == 'solid':
+                self.__branchesPrimitives.append(Line(
+                     pt1=[branchXOrigin, branchYOrigin],
+                     pt2=[branchXdestination, branchYdestination],
+                     colour=(255, 255, 255), thickness=5, drawProportion=0, frameWidth=videoWidth, frameHeight=videoHeight))
+            elif branchInfo.branchLineType == 'dashed':
+                self.__branchesPrimitives.append(DashedLine(
+                    pt1=[branchXOrigin, branchYOrigin],
+                    pt2=[branchXdestination, branchYdestination],
+                    colour=(255, 255, 255), thickness=5, drawProportion=0, frameWidth=videoWidth,
+                    frameHeight=videoHeight))
+            # Branching text
+            proportion = branchInfo.textPositionProportion
+            textX = branchXOrigin + (branchXdestination - branchXOrigin) * proportion
+            textY = branchYOrigin + (branchYdestination - branchYOrigin) * proportion
+            self.__branchesPrimitives.append(Text(text=branchInfo.branchText, org=[textX, textY], fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1,
+                 colour=(255, 255, 255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5,
+                 frameWidth=videoWidth, frameHeight=videoHeight, drawOverElementsBehind=True))
 
     def drawInBranches(self, startTime, drawDuration, holdDuration):
         drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
@@ -240,10 +256,10 @@ smallDemoBoard1 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=0.5, y=0.5, squa
                                              [None,'black_bishop',None],
                                              [None,None,None]],
                                  text=None,
-                                 branchInfoList=[BranchInfo('b1', 'solid'),
-                                                 BranchInfo('b2', 'solid'),
-                                                 BranchInfo('b3', 'solid'),
-                                                 BranchInfo('b4', 'solid')],
+                                 branchInfoList=[BranchInfo('b1', 'solid', 0.3),
+                                                 BranchInfo('b2', 'solid', 0.6),
+                                                 BranchInfo('b3', 'solid', 0.3),
+                                                 BranchInfo('b4', 'dashed',0.6)],
                                  horizontalSpacingBetweenLines=0.0333,
                                  verticalSpacingBetweenBoards=2*0.0333*(videoWidth/videoHeight),
                                  videoWidth=videoWidth, videoHeight=videoHeight)
