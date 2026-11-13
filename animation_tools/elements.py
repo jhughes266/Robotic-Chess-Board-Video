@@ -451,20 +451,20 @@ class Text(PrimitiveElement):
                         thickness=self.__thickness,
                         lineType=self.__lineType
                         )
+            if self._drawProportion != 1:
+                cv2.rectangle(img=frame,
+                              pt1=(int(org[0] + pixelsRevealed), int(org[1] - textHeight)),
+                              pt2=(int(org[0] + pixelsRevealed + self.__insertCursorThickness), int(org[1])),
+                              color=self._colour,
+                              thickness=-1,
+                              lineType=self.__lineType)
 
-            cv2.rectangle(img=frame,
-                          pt1=(int(org[0] + pixelsRevealed), int(org[1] - textHeight)),
-                          pt2=(int(org[0] + pixelsRevealed + self.__insertCursorThickness), int(org[1])),
-                          color=self._colour,
-                          thickness=-1,
-                          lineType=self.__lineType)
-
-            cv2.rectangle(img=frame,
-                          pt1=(int(org[0] + pixelsRevealed + self.__insertCursorThickness + 1), int(org[1] - textHeight)),
-                          pt2=(int(org[0] + textWidth), int(org[1] + 0.3 * textHeight)),
-                          color=self.__backgroundColour,
-                          thickness=-1,
-                          lineType=self.__lineType)
+                cv2.rectangle(img=frame,
+                              pt1=(int(org[0] + pixelsRevealed + self.__insertCursorThickness + 1), int(org[1] - textHeight)),
+                              pt2=(int(org[0] + textWidth), int(org[1] + 0.3 * textHeight)),
+                              color=self.__backgroundColour,
+                              thickness=-1,
+                              lineType=self.__lineType)
 
 
 class Image(PrimitiveElement):
