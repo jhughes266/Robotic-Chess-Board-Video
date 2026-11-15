@@ -4,7 +4,7 @@ from animation_tools.scene_animation import *
 import math
 
 class CameraModel:
-    def __init__(self, sceneAnimator, xTopLeft, yTopLeft, xAcross, yDown, numberOfPanelColumns, numberOfPanelRows, panelFrameHeight, apertureAngleFromHorizontal,apertureDistanceFromPlane, videoWidth, videoHeight, videoDuration, cameraImage=None, lineThroguhApertureLength=None, backgroundColour = (0, 0, 0), reverseLineThroughAperture = False):
+    def __init__(self, sceneAnimator, xTopLeft, yTopLeft, xAcross, yDown, numberOfPanelColumns, numberOfPanelRows, panelFrameHeight, apertureAngleFromHorizontal, apertureDistanceFromPlane, videoWidth, videoHeight, videoDuration, cameraImage=None, lineThroguhApertureLengthArray=None, backgroundColour = (0, 0, 0), reverseLineThroughAperture = False):
         self.__sceneAnimator = sceneAnimator
         self.__xTopLeft = xTopLeft
         self.__yTopLeft = yTopLeft
@@ -17,7 +17,7 @@ class CameraModel:
         self.__videoHeight = videoHeight
         self.__videoDuration = videoDuration
         self.__cameraImage = cameraImage
-        self.__lineThroughApertureLength = lineThroguhApertureLength
+        self.__lineThroughApertureLengthArray = lineThroguhApertureLengthArray
         self.__backgroundColour = backgroundColour
         self.__reverseLineThroughAperture = reverseLineThroughAperture
 
@@ -84,7 +84,6 @@ class CameraModel:
         # Camera image and lines through aperture
         for i, row in enumerate(self.__cameraImage):
             for j, pixelValue in enumerate(row):
-
                 if tuple(pixelValue) == self.__backgroundColour:
                     continue
 
@@ -112,7 +111,7 @@ class CameraModel:
                 aSub = self.__apertureX - pixelCenterX
                 hSub = math.sqrt((self.__apertureX - pixelCenterX)**2 + (self.__apertureY - pixelCenterY)**2)
 
-                h = self.__lineThroughApertureLength
+                h = self.__lineThroughApertureLengthArray[i][j]
                 o = h * (oSub/hSub)
                 a = h * (aSub/hSub)
 
@@ -209,12 +208,22 @@ class CameraModel:
             drawAnimation.addPrimitive(primitive)
             holdAnimation.addPrimitive(primitive)
 
-        for primitive in self.__lineThroughAperturePrimitiveList:
-            drawAnimation.addPrimitive(primitive)
-            holdAnimation.addPrimitive(primitive)
-
         self.__sceneAnimator.addPrimitiveAnimation(drawAnimation)
         self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
+
+
+    def vanishLinesThroughAperture(self, startTime, vanishDuration):
+        vanishAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=1, endDrawProportion=0, startTime=startTime,
+                                           endTime=startTime + vanishDuration,
+                                           fps=fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+
+        for primitive in self.__lineThroughAperturePrimitiveList:
+            vanishAnimation.addPrimitive(primitive)
+
+        self.__sceneAnimator.addPrimitiveAnimation(vanishAnimation)
+
 
 
     def drawInAperture(self, startTime, drawDuration, holdDuration):
@@ -366,27 +375,35 @@ videoHeight = 2160
 fps = 30
 videoDuration = 15
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='3a-basic_camera_model.mp4')
-cameraImage = [[[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
-[[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
-[[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
-[[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [0,0,255], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
-[[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
-[[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
-[[255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]],
-               ]
-cameraModel = CameraModel(sceneAnimator=sceneAnimator, xTopLeft=.2, yTopLeft=0.6, xAcross=0.1, yDown=0.1, numberOfPanelRows=7, numberOfPanelColumns=14, panelFrameHeight=0.2, apertureAngleFromHorizontal=-30, apertureDistanceFromPlane=400, videoWidth=videoWidth, videoHeight=videoHeight, videoDuration=videoDuration, cameraImage=cameraImage, lineThroguhApertureLength=.5, backgroundColour=(255, 0, 0), reverseLineThroughAperture=True)
+cameraImage = [[[0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+               [[0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,255,0], [0,255,0], [0,255,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+               [[0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,255,0], [0,255,0], [0,255,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+               [[0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,255,0], [0,255,0], [0,255,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+               [[0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [255,255,255], [255,255,255], [255,255,255], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+               [[0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [255,255,255], [255,255,255], [255,255,255], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+               [[0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [255,255,255], [255,255,255], [255,255,255], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]],
+                ]
+lineThroughApertureLengthArray = [
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0.375,0.375,0.375,0,0,0,0,0,0],
+    [0,0,0,0,0,0.375,0.375,0.375,0,0,0,0,0,0],
+    [0,0,0,0,0,0.39,0.39,0.39,0,0,0,0,0,0],
+    [0,0,0,0,0,0.42,0.42,0.42,0,0,0,0,0,0],
+    [0,0,0,0,0,0.45,0.45,0.45,0,0,0,0,0,0],
+    [0,0,0,0,0,0.48,0.48,0.48,0,0,0,0,0,0]
+]
+cameraModel = CameraModel(sceneAnimator=sceneAnimator, xTopLeft=.3, yTopLeft=0.526, xAcross=0.075, yDown=0.1, numberOfPanelRows=7, numberOfPanelColumns=14, panelFrameHeight=0.2, apertureAngleFromHorizontal=-10, apertureDistanceFromPlane=700, videoWidth=videoWidth, videoHeight=videoHeight, videoDuration=videoDuration, cameraImage=cameraImage, lineThroguhApertureLengthArray=lineThroughApertureLengthArray, backgroundColour=(0, 0, 0), reverseLineThroughAperture=False)
 
-stylus = Stylus(sceneAnimator=sceneAnimator, xBottomLeft=0.5, yBottomLeft=0.5, greenTipXLength=0.05, greenTipYLength=0.1, whiteHandleYLength=0.3, videoWidth=videoWidth, videoHeight=videoHeight)
+stylus = Stylus(sceneAnimator=sceneAnimator, xBottomLeft=0.7, yBottomLeft=0.65, greenTipXLength=0.025, greenTipYLength=0.1, whiteHandleYLength=0.3, videoWidth=videoWidth, videoHeight=videoHeight)
 
 stylus.drawInStylusTipAndHandle(startTime=0, drawDuration=2, holdDuration=videoDuration)
 stylus.drawInStylusLeftTip(startTime=2.1, drawDuration=.1, holdDuration=videoDuration)
 
-cameraModel.drawInLinesThroughAperture(startTime=0, drawDuration=8, holdDuration=videoDuration)
+cameraModel.drawInLinesThroughAperture(startTime=1, drawDuration=4, holdDuration=videoDuration)
 cameraModel.drawInPixels(startTime=4, drawDuration=1, holdDuration=5)
-cameraModel.drawInAperture(startTime=0, drawDuration=1, holdDuration=videoDuration)
+cameraModel.drawInAperture(startTime=1, drawDuration=1, holdDuration=videoDuration)
 cameraModel.drawInSensorPanel(startTime=0, drawDuration=1, holdDuration=videoDuration)
 
-cameraModel.moveCamera(startTime=10, duration=2, xDelta=0.0, yDelta=0.1)
 
 
 
