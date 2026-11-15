@@ -1065,24 +1065,27 @@ print(int(0.5))
 twoAxisRobot = TwoAxisRobotAndGripper(sceneAnimator, videoWidth, videoHeight, videoDuration, fps, moveablePieceName='white_rook')
 axes = NumberedAxes(sceneAnimator=sceneAnimator, topLeftX=0.07, topLeftY=0.1, videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
 
-#positionMessage = Message(sceneAnimator=sceneAnimator, x=0.6, y=0.5, message='Carriage moving to x = 100, y = 20', videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+leftRightMovement = Message(sceneAnimator=sceneAnimator, x=0.6, y=0.5, message='Carriage will only move left and right', videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+positionMessage = Message(sceneAnimator=sceneAnimator, x=0.6, y=0.5, message='Carriage moving to x = 100', videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
 
 
 # Draw in the gantry
 twoAxisRobot.drawInAnimation(startTime=0, drawInDuration=1)
-twoAxisRobot.moveGantry(startTime=1, duration=1, xGantry=100, yGantry=60)
-twoAxisRobot.moveGantry(startTime=2, duration=1, xGantry=20, yGantry=60)
-twoAxisRobot.moveGantry(startTime=3, duration=1, xGantry=100, yGantry=60)
+twoAxisRobot.moveGantry(startTime=1, duration=1, xGantry=20, yGantry=60)
+twoAxisRobot.moveGantry(startTime=2, duration=1, xGantry=100, yGantry=60)
+twoAxisRobot.moveGantry(startTime=3, duration=1, xGantry=20, yGantry=60)
 
-graduallCarriageSlowDown(twoAxisRobot=twoAxisRobot, startTime=4, duration=2, startX=100, endX=20, startY=60, endY=60, deltaT=0.05)
+graduallCarriageSlowDown(twoAxisRobot=twoAxisRobot, startTime=4, duration=1, startX=20, endX=100, startY=60, endY=60, deltaT=0.05)
 # Messages
 
+leftRightMovement.drawInText(startTime=0, drawDuration=1, holdDuration=1)
+leftRightMovement.drawOutText(startTime=2, vanishDuration=1)
 
-#positionMessage.drawInText(startTime=7, drawDuration=1, holdDuration=1)
-#positionMessage.drawOutText(startTime=9, vanishDuration=1)
+positionMessage.drawInText(startTime=7, drawDuration=1, holdDuration=1)
+positionMessage.drawOutText(startTime=9, vanishDuration=1)
 
 # Axes
-axes.drawInAxes(startTime=0, drawDuration=1, holdDuration=videoDuration)
+axes.drawInAxes(startTime=4, drawDuration=1, holdDuration=videoDuration)
 
 
 sceneAnimator.renderAnimation()
