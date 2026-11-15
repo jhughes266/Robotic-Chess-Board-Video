@@ -4,7 +4,7 @@ from animation_tools.scene_animation import *
 videoWidth = 3840
 videoHeight = 2160
 fps = 30
-videoDuration = 10
+videoDuration = 40
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='1a-video_structure.mp4')
 
 # Animation primitives
@@ -52,131 +52,183 @@ column4bContents = Text(text="robotic chess board", org=[0.8,0.38], fontFace=cv2
 
 # Animations
 # Heading ################################################################################################################
-drawHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=0, endTime=1, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawHeadingStartTime = 0
+drawHeadingEndTime = 1
+
+drawHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=drawHeadingStartTime, endTime=drawHeadingEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawHeading.addPrimitive(tableTitle)
 
-holdHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=1, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=drawHeadingEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdHeading.addPrimitive(tableTitle)
 
 
 # Table ################################################################################################################
-drawLine1 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=1, endTime=2, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+tableLineStartTime = 1
+tableLineEndTime = 2
+offsetBetweenLines = 0.2
+
+drawLine1 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=tableLineStartTime, endTime=tableLineEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawLine1.addPrimitive(line1)
-drawLine2 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=1.6, endTime=2.6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-drawLine2.addPrimitive(line2)
-drawLine3 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=1.2, endTime=2.2, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-drawLine3.addPrimitive(line3)
-drawLine4 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=2.4, endTime=3.4, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-drawLine4.addPrimitive(line4)
-drawLine5 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=1.4, endTime=2.4, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-drawLine5.addPrimitive(line5)
-drawLine6 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=1.8, endTime=2.8, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-drawLine6.addPrimitive(line6)
-drawLine7 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=2, endTime=3, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-drawLine7.addPrimitive(line7)
-drawLine8 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=2.2, endTime=3.2, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-drawLine8.addPrimitive(line8)
-
-
-holdLine1 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=2, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdLine1 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=tableLineEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdLine1.addPrimitive(line1)
-holdLine2 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=2.6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-holdLine2.addPrimitive(line2)
-holdLine3 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=2.2, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+tableLineStartTime += offsetBetweenLines
+tableLineEndTime += offsetBetweenLines
+drawLine3 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=tableLineStartTime, endTime=tableLineEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawLine3.addPrimitive(line3)
+holdLine3 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=tableLineEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdLine3.addPrimitive(line3)
-holdLine4 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=3.4, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
-holdLine4.addPrimitive(line4)
-holdLine5 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=2.4, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+tableLineStartTime += offsetBetweenLines
+tableLineEndTime += offsetBetweenLines
+drawLine5 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=tableLineStartTime, endTime=tableLineEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawLine5.addPrimitive(line5)
+holdLine5 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=tableLineEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdLine5.addPrimitive(line5)
-holdLine6 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=2.8, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+tableLineStartTime += offsetBetweenLines
+tableLineEndTime += offsetBetweenLines
+drawLine2 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=tableLineStartTime, endTime=tableLineEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawLine2.addPrimitive(line2)
+holdLine2 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=tableLineEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdLine2.addPrimitive(line2)
+
+tableLineStartTime += offsetBetweenLines
+tableLineEndTime += offsetBetweenLines
+drawLine6 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=tableLineStartTime, endTime=tableLineEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawLine6.addPrimitive(line6)
+holdLine6 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=tableLineEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdLine6.addPrimitive(line6)
-holdLine7 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=3, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+tableLineStartTime += offsetBetweenLines
+tableLineEndTime += offsetBetweenLines
+drawLine7 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=tableLineStartTime, endTime=tableLineEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawLine7.addPrimitive(line7)
+holdLine7 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=tableLineEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdLine7.addPrimitive(line7)
-holdLine8 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=3.2, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+
+tableLineStartTime += offsetBetweenLines
+tableLineEndTime += offsetBetweenLines
+drawLine8 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=tableLineStartTime, endTime=tableLineEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawLine8.addPrimitive(line8)
+holdLine8 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=tableLineEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdLine8.addPrimitive(line8)
 
+tableLineStartTime += offsetBetweenLines
+tableLineEndTime += offsetBetweenLines
+drawLine4 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=tableLineStartTime, endTime=tableLineEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawLine4.addPrimitive(line4)
+holdLine4 = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=1, endDrawProportion=1, startTime=tableLineEndTime, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdLine4.addPrimitive(line4)
+
+
 # Table Contents ################################################################################################################
-drawColumn1Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+column1HeadingStartTime = 4
+column2HeadingStartTime = 4
+column3aHeadingStartTime = 4
+column3bHeadingStartTime = 4
+column4HeadingStartTime = 4
+
+columnHeadingDrawDuration = 2
+
+drawColumn1Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1HeadingStartTime, endTime=column1HeadingStartTime + columnHeadingDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn1Heading.addPrimitive(column1Heading)
-drawColumn2Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn2Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2HeadingStartTime, endTime=column2HeadingStartTime + columnHeadingDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn2Heading.addPrimitive(column2Heading)
-drawColumn3aHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn3aHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column3aHeadingStartTime, endTime=column3aHeadingStartTime + columnHeadingDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn3aHeading.addPrimitive(column3aHeading)
-drawColumn3bHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn3bHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column3bHeadingStartTime, endTime=column3bHeadingStartTime + columnHeadingDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn3bHeading.addPrimitive(column3bHeading)
-drawColumn4Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn4Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column4HeadingStartTime, endTime=column4HeadingStartTime + columnHeadingDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn4Heading.addPrimitive(column4Heading)
 
 
-drawColumn1aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+column1aContentsStartTime = 4
+column1bContentsStartTime = 6
+column1cContentsStartTime = 8
+column2aContentsStartTime = 10
+column2bContentsStartTime = 12
+column2cContentsStartTime = 14
+column2dContentsStartTime = 16
+column2eContentsStartTime = 18
+column2fContentsStartTime = 20
+column3aContentsStartTime = 22
+column3bContentsStartTime = 24
+column3cContentsStartTime = 26
+column4aContentsStartTime = 28
+column4bContentsStartTime = 30
+
+columnContentDrawDuration = 2
+
+drawColumn1aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1aContentsStartTime, endTime=column1aContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn1aContents.addPrimitive(column1aContents)
-drawColumn1bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn1bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1bContentsStartTime, endTime=column1bContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn1bContents.addPrimitive(column1bContents)
-drawColumn1cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn1cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1cContentsStartTime, endTime=column1cContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn1cContents.addPrimitive(column1cContents)
-drawColumn2aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn2aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2aContentsStartTime, endTime=column2aContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn2aContents.addPrimitive(column2aContents)
-drawColumn2bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn2bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2bContentsStartTime, endTime=column2bContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn2bContents.addPrimitive(column2bContents)
-drawColumn2cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn2cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2cContentsStartTime, endTime=column2cContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn2cContents.addPrimitive(column2cContents)
-drawColumn2dContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn2dContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2dContentsStartTime, endTime=column2dContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn2dContents.addPrimitive(column2dContents)
-drawColumn2eContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn2eContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2eContentsStartTime, endTime=column2eContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn2eContents.addPrimitive(column2eContents)
-drawColumn2fContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn2fContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2fContentsStartTime, endTime=column2fContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn2fContents.addPrimitive(column2fContents)
-drawColumn3aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn3aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column3aContentsStartTime, endTime=column3aContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn3aContents.addPrimitive(column3aContents)
-drawColumn3bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn3bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column3bContentsStartTime, endTime=column3bContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn3bContents.addPrimitive(column3bContents)
-drawColumn3cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn3cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column3cContentsStartTime, endTime=column3cContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn3cContents.addPrimitive(column3cContents)
-drawColumn4aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn4aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column4aContentsStartTime, endTime=column4aContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn4aContents.addPrimitive(column4aContents)
-drawColumn4bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=4, endTime=6, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+drawColumn4bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column4bContentsStartTime, endTime=column4bContentsStartTime + columnContentDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 drawColumn4bContents.addPrimitive(column4bContents)
 
 
-holdColumn1Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn1Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1HeadingStartTime + columnHeadingDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn1Heading.addPrimitive(column1Heading)
-holdColumn2Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn2Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1HeadingStartTime + columnHeadingDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn2Heading.addPrimitive(column2Heading)
-holdColumn3aHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn3aHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1HeadingStartTime + columnHeadingDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn3aHeading.addPrimitive(column3aHeading)
-holdColumn3bHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn3bHeading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1HeadingStartTime + columnHeadingDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn3bHeading.addPrimitive(column3bHeading)
-holdColumn4Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn4Heading = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1HeadingStartTime + columnHeadingDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn4Heading.addPrimitive(column4Heading)
 
 
-holdColumn1aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn1aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1aContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn1aContents.addPrimitive(column1aContents)
-holdColumn1bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn1bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1bContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn1bContents.addPrimitive(column1bContents)
-holdColumn1cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn1cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column1cContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn1cContents.addPrimitive(column1cContents)
-holdColumn2aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn2aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2aContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn2aContents.addPrimitive(column2aContents)
-holdColumn2bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn2bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2bContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn2bContents.addPrimitive(column2bContents)
-holdColumn2cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn2cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2cContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn2cContents.addPrimitive(column2cContents)
-holdColumn2dContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn2dContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2dContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn2dContents.addPrimitive(column2dContents)
-holdColumn2eContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn2eContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2eContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn2eContents.addPrimitive(column2eContents)
-holdColumn2fContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn2fContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column2fContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn2fContents.addPrimitive(column2fContents)
-holdColumn3aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn3aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column3aContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn3aContents.addPrimitive(column3aContents)
-holdColumn3bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn3bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column3bContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn3bContents.addPrimitive(column3bContents)
-holdColumn3cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn3cContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column3cContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn3cContents.addPrimitive(column3cContents)
-holdColumn4aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn4aContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column4aContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn4aContents.addPrimitive(column4aContents)
-holdColumn4bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=6, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+holdColumn4bContents = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0, 0.0], startDrawProportion=0, endDrawProportion=1, startTime=column4aContentsStartTime + columnContentDrawDuration, endTime=videoDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 holdColumn4bContents.addPrimitive(column4bContents)
 
 
