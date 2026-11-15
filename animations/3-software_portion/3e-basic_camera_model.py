@@ -443,28 +443,28 @@ cameraModel2 = CameraModel(sceneAnimator=sceneAnimator, xTopLeft=.3 - positionMu
 
 stylus = Stylus(sceneAnimator=sceneAnimator, xBottomLeft=0.7, yBottomLeft=0.65, greenTipXLength=0.025, greenTipYLength=0.1, whiteHandleYLength=0.3, videoWidth=videoWidth, videoHeight=videoHeight)
 
-stylus.drawInStylusTipAndHandle(startTime=0, drawDuration=2, holdDuration=videoDuration)
-stylus.drawInStylusLeftTip(startTime=2.1, drawDuration=.1, holdDuration=videoDuration)
+stylus.drawInStylusTipAndHandle(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+stylus.drawInStylusLeftTip(startTime=0, drawDuration=.1, holdDuration=videoDuration)
 
 
-cameraModel2.drawInLinesThroughAperture(startTime=1, drawDuration=4, holdDuration=videoDuration)
-cameraModel2.vanishLinesThroughAperture(startTime=5, vanishDuration=4)
-cameraModel2.drawInPixels(startTime=4, drawDuration=1, holdDuration=5)
-cameraModel2.drawInAperture(startTime=1, drawDuration=1, holdDuration=videoDuration)
-cameraModel2.drawInSensorPanel(startTime=0, drawDuration=1, holdDuration=videoDuration)
+cameraModel2.drawInLinesThroughAperture(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+cameraModel2.vanishLinesThroughAperture(startTime=1, vanishDuration=4)
+cameraModel2.drawInPixels(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+cameraModel2.drawInAperture(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+cameraModel2.drawInSensorPanel(startTime=0, drawDuration=.1, holdDuration=videoDuration)
 
 
-cameraModel1.drawInLinesThroughAperture(startTime=1, drawDuration=4, holdDuration=videoDuration)
-cameraModel1.drawInPixels(startTime=4, drawDuration=1, holdDuration=5)
-cameraModel1.drawInAperture(startTime=1, drawDuration=1, holdDuration=videoDuration)
-cameraModel1.drawInSensorPanel(startTime=0, drawDuration=1, holdDuration=videoDuration)
-
-
-
+cameraModel1.drawInLinesThroughAperture(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+cameraModel1.drawInPixels(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+cameraModel1.drawInAperture(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+cameraModel1.drawInSensorPanel(startTime=0, drawDuration=.1, holdDuration=videoDuration)
 
 
 
-stylus.drawInStylusRightTip(startTime=2.1, drawDuration=.1, holdDuration=videoDuration)
+
+
+
+stylus.drawInStylusRightTip(startTime=0, drawDuration=.1, holdDuration=videoDuration)
 
 
 

@@ -400,7 +400,7 @@ stylus.drawInStylusTipAndHandle(startTime=0, drawDuration=2, holdDuration=videoD
 stylus.drawInStylusLeftTip(startTime=2.1, drawDuration=.1, holdDuration=videoDuration)
 
 cameraModel.drawInLinesThroughAperture(startTime=1, drawDuration=4, holdDuration=videoDuration)
-cameraModel.drawInPixels(startTime=4, drawDuration=1, holdDuration=5)
+cameraModel.drawInPixels(startTime=5, drawDuration=.1, holdDuration=5)
 cameraModel.drawInAperture(startTime=1, drawDuration=1, holdDuration=videoDuration)
 cameraModel.drawInSensorPanel(startTime=0, drawDuration=1, holdDuration=videoDuration)
 

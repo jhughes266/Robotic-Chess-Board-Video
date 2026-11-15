@@ -421,23 +421,22 @@ cameraModel = CameraModel(sceneAnimator=sceneAnimator, xTopLeft=.3, yTopLeft=0.5
 
 stylus = Stylus(sceneAnimator=sceneAnimator, xBottomLeft=0.7, yBottomLeft=0.65, greenTipXLength=0.025, greenTipYLength=0.1, whiteHandleYLength=0.3, videoWidth=videoWidth, videoHeight=videoHeight)
 
-stylus.drawInStylusTipAndHandle(startTime=0, drawDuration=2, holdDuration=videoDuration)
-stylus.drawInStylusLeftTip(startTime=2.1, drawDuration=.1, holdDuration=videoDuration)
+stylus.drawInStylusTipAndHandle(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+stylus.drawInStylusLeftTip(startTime=0, drawDuration=.1, holdDuration=videoDuration)
 
 proportionOfLine = 0.25
 stylus.moveStylus(startTime=6, duration=2, xDelta=proportionOfLine * (0.33482142857142855-0.7055603800368151), yDelta=proportionOfLine * (0.6474285714285714-0.5910581016208272))
 stylus.moveStylus(startTime=8, duration=2, xDelta=-proportionOfLine * (0.33482142857142855-0.7055603800368151), yDelta=-proportionOfLine * (0.6474285714285714-0.5910581016208272))
 
 cameraModel.drawInLinesThroughAperture(startTime=1, drawDuration=4, holdDuration=videoDuration)
-cameraModel.drawInPixels(startTime=4, drawDuration=1, holdDuration=5)
-cameraModel.drawInAperture(startTime=1, drawDuration=1, holdDuration=videoDuration)
-cameraModel.drawInSensorPanel(startTime=0, drawDuration=1, holdDuration=videoDuration)
-#cameraModel.vanishLinesThroughAperture(startTime=8, vanishDuration=4)
-#cameraModel.moveCamera(startTime=10, duration=2, xDelta=0.0, yDelta=0.1)
+cameraModel.drawInPixels(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+cameraModel.drawInAperture(startTime=0, drawDuration=.1, holdDuration=videoDuration)
+cameraModel.drawInSensorPanel(startTime=0, drawDuration=.1, holdDuration=videoDuration)
 
 
 
-stylus.drawInStylusRightTip(startTime=2.1, drawDuration=.1, holdDuration=videoDuration)
+
+stylus.drawInStylusRightTip(startTime=0, drawDuration=.1, holdDuration=videoDuration)
 
 
 
