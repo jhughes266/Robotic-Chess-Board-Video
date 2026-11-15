@@ -4,7 +4,7 @@ from animation_tools.scene_animation import *
 videoWidth = 3840
 videoHeight = 2160
 fps = 30
-videoDuration = 11
+videoDuration = 30
 
 
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='2a-board_layout.mp4')
@@ -18,6 +18,7 @@ squareHeight = (videoWidth / videoHeight) * squareWidth
 topLeft = [((1 - (12 * squareWidth))/ 2) + 2 * squareWidth, ((1 - (12 * squareHeight )) / 2) + 2 * squareHeight -.05]
 drawDuration = 2.2
 lightSquare = True
+
 # Dictionary to store all the piece path files
 squareToPiecePath = {
     0: "black_rook",
@@ -60,11 +61,14 @@ squareToPiecePath = {
     62: "white_pawn",
     63: "white_rook"
 }
+
+drawOffsetTime = 1
+
 for i in range(8):
     for j in range(8):
         # Squares
         squareIdx = (i * 8 + j)
-        startTime = (squareIdx/64) * drawDuration
+        startTime = (squareIdx/64) * drawDuration + drawOffsetTime
         squareDrawDuration = (drawDuration/64)
         if lightSquare:
             colour = (89,155,240)
@@ -208,19 +212,20 @@ for enIdx, i in enumerate(range(11,0,-1)):
     textEndTime = startTime+squareDrawDuration
 
 textDrawStartTime = 3
+textDrawDuration = 0.25
 textLocation = [0.175, 0.4]
 text = Text(text="Captured piece storage", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(0, 0, 255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
 
-textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+textDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textDraw.addPrimitive(text)
 sceneAnimator.addPrimitiveAnimation(textDraw)
 
 
-textHold = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime+0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textHold = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime+textDrawDuration, endTime=textEndTime-textDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textHold.addPrimitive(text)
 sceneAnimator.addPrimitiveAnimation(textHold)
 
-textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-textDrawDuration, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textVanish.addPrimitive(text)
 sceneAnimator.addPrimitiveAnimation(textVanish)
 ""
@@ -341,16 +346,16 @@ for enIdx, i in enumerate(range(9,0,-1)):
 textLocation = [0.175, 0.4]
 text = Text(text="Visual buffer", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(192,192,192), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
 
-textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+drawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textDraw.addPrimitive(text)
 sceneAnimator.addPrimitiveAnimation(textDraw)
 
 
-textHold = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime+0.5, endTime=textEndTime-0.5, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textHold = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=1, startTime=textDrawStartTime+drawDuration, endTime=textEndTime-drawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textHold.addPrimitive(text)
 sceneAnimator.addPrimitiveAnimation(textHold)
 
-textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-0.5, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+textVanish = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=1, endDrawProportion=0, startTime=textEndTime-drawDuration, endTime=textEndTime, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textVanish.addPrimitive(text)
 sceneAnimator.addPrimitiveAnimation(textVanish)
 ########################################################################################################################
