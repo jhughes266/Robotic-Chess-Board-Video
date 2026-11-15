@@ -842,6 +842,79 @@ class SideOnGripper:
 
 
 
+class Message:
+    def __init__(self, sceneAnimator, x, y, message, videoWidth, videoHeight, fps):
+        self.__sceneAnimator = sceneAnimator
+        self.__videoWidth = videoWidth
+        self.__videoHeight = videoHeight
+        self.__fps = fps
+        self.__text = Text(text=message, org=[x, y], fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3,
+                      colour=(0, 0, 255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5,
+                      frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+    def drawInText(self, startTime, drawDuration, holdDuration):
+        drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                startDrawProportion=0, endDrawProportion=1,
+                                                startTime=startTime,
+                                                endTime=startTime + drawDuration,
+                                                fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+        holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                startDrawProportion=1, endDrawProportion=1,
+                                                startTime=startTime + drawDuration,
+                                                endTime=startTime + drawDuration + holdDuration,
+                                                fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+        drawAnimation.addPrimitive(self.__text)
+        holdAnimation.addPrimitive(self.__text)
+        self.__sceneAnimator.addPrimitiveAnimation(drawAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
+
+    def drawOutText(self, startTime, vanishDuration):
+        vanishAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=1, endDrawProportion=0,
+                                           startTime=startTime,
+                                           endTime=startTime + vanishDuration,
+                                           fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+
+        vanishAnimation.addPrimitive(self.__text)
+        self.__sceneAnimator.addPrimitiveAnimation(vanishAnimation)
+
+
+class Arrow:
+    def __init__(self, sceneAnimator, x1, y1, x2, y2, colour, thickness, videoWidth, videoHeight, fps):
+        self.__sceneAnimator = sceneAnimator
+        self.__videoWidth = videoWidth
+        self.__videoHeight = videoHeight
+        self.__fps = fps
+        self.__arrowedLine = ArrowedLine(pt1=[x1,y1],
+             pt2=[x2, y2],
+             colour=colour, thickness=thickness, drawProportion=0, frameWidth=videoWidth,
+             frameHeight=videoHeight)
+
+    def drawInArrow(self, startTime, drawDuration, holdDuration):
+        drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=0, endDrawProportion=1,
+                                           startTime=startTime,
+                                           endTime=startTime + drawDuration,
+                                           fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+        holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=1, endDrawProportion=1,
+                                           startTime=startTime + drawDuration,
+                                           endTime=startTime + drawDuration + holdDuration,
+                                           fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+        drawAnimation.addPrimitive(self.__arrowedLine)
+        holdAnimation.addPrimitive(self.__arrowedLine)
+
+        self.__sceneAnimator.addPrimitiveAnimation(drawAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
+
+
+
+
 
 videoWidth = 3840
 videoHeight = 2160
@@ -852,7 +925,7 @@ sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, f
 # Gripper Animation
 sideOnGripper = SideOnGripper(sceneAnimator=sceneAnimator, xTopLeft=0.6, yTopLeft=0.4, scale=1.5, videoWidth=videoWidth, videoHeight=videoHeight, pieceName='white_rook')
 
-gripperOffset = 13
+gripperOffset = 18
 sideOnGripper.drawInAnimation(startTime=gripperOffset + 0, drawDuration=1, holdDuration=1)
 sideOnGripper.toggle(startTime=gripperOffset + 2, verticalDuration=0.5, clawCloseDuration=0.5, holdDuration=1)
 sideOnGripper.toggle(startTime=gripperOffset + 4, verticalDuration=0.5, clawCloseDuration=0.5, holdDuration=videoDuration)
@@ -894,13 +967,14 @@ twoAxisRobot.moveGantry(startTime=14, duration=1, xGantry=90, yGantry=40)
 twoAxisRobot.moveGantry(startTime=15, duration=1, xGantry=70, yGantry=60)
 # Move entire chess board to allow showing of the gripper
 twoAxisRobot.moveEntireRobot(startTime=16, duration=2, xDelta=-0.25, yDelta=0.0)
-twoAxisRobot.moveGantry(startTime=20, duration=1, xSquare=2, ySquare=9)
+twoAxisRobot.moveGantry(startTime=20, duration=1, xSquare=0, ySquare=9)
+twoAxisRobot.moveGantry(startTime=21, duration=1, xSquare=2, ySquare=9)
 twoAxisRobot.moveGantry(startTime=22, duration=2, xSquare=6, ySquare=9)
 twoAxisRobot.moveGantry(startTime=25, duration=1, xSquare=9, ySquare=9)
 # Gripper Toggle
 twoAxisRobot.toggleGripper(startTime=18, duration=1)
 twoAxisRobot.toggleGripper(startTime=19, duration=1)
-twoAxisRobot.toggleGripper(startTime=21, duration=1)
+twoAxisRobot.toggleGripper(startTime=22, duration=1)
 twoAxisRobot.toggleGripper(startTime=24, duration=1)
 # Drawing in the moveable piece
 twoAxisRobot.drawInMoveablePiece(startTime=18, duration=1)
@@ -911,6 +985,22 @@ twoAxisRobot.moveMoveablePiece(startTime=22, duration=videoDuration - 22, xSqaur
 # Fade in chess board
 twoAxisRobot.drawInChessBoard(startTime=9, boardDrawDuration=2, boardHoldDuration=2, boardSeeThroughDuration=1, boardSeeThroughHoldDuration=20)
 
+# Label point to gripper
+gripperMessage = Message(sceneAnimator=sceneAnimator, x=0.75, y=0.5, message='Gripper', videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+gripperMessage.drawInText(startTime=14, drawDuration=1, holdDuration=1)
+gripperMessage.drawOutText(startTime=16, vanishDuration=1)
+
+arrow = Arrow(sceneAnimator=sceneAnimator, x1=0.75, y1=.5, x2=0.5, y2=0.5, thickness=10, colour=(255,255,255), videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+arrow.drawInArrow(startTime=14, drawDuration=1, holdDuration=3)
+
+# Label the top down and side on views
+topMessage = Message(sceneAnimator=sceneAnimator, x=0.25, y=0.1, message='Top Down View', videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+topMessage.drawInText(startTime=14, drawDuration=1, holdDuration=1)
+topMessage.drawOutText(startTime=16, vanishDuration=1)
+
+sideOneMessage = Message(sceneAnimator=sceneAnimator, x=0.75, y=0.1, message='Side On View', videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+sideOneMessage.drawInText(startTime=14, drawDuration=1, holdDuration=1)
+sideOneMessage.drawOutText(startTime=16, vanishDuration=1)
 
 sceneAnimator.renderAnimation()
 

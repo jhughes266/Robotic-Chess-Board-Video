@@ -214,7 +214,7 @@ for enIdx, i in enumerate(range(11,0,-1)):
 textDrawStartTime = 3
 textDrawDuration = 0.25
 textLocation = [0.175, 0.4]
-text = Text(text="Captured piece storage", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(0, 0, 255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
+text = Text(text="Captured Piece Storage", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(0, 0, 255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
 
 textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+textDrawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textDraw.addPrimitive(text)
@@ -344,7 +344,7 @@ for enIdx, i in enumerate(range(9,0,-1)):
 
 
 textLocation = [0.175, 0.4]
-text = Text(text="Visual buffer", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(192,192,192), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
+text = Text(text="Visual Buffer", org=textLocation, fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3, colour=(192,192,192), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5, frameWidth=videoWidth, frameHeight=videoHeight)
 
 textDraw = PrimitiveAnimation(startLocation=[0.0,0.0], endLocation=[0.0,.0], startDrawProportion=0, endDrawProportion=1, startTime=textDrawStartTime, endTime=textDrawStartTime+drawDuration, fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
 textDraw.addPrimitive(text)
