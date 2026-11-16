@@ -361,11 +361,54 @@ class SmallDemoBoard:
         self.__sceneAnimator.addPrimitiveAnimation(moveAnimation)
 
 
+
+class Message:
+    def __init__(self, sceneAnimator, x, y, message, videoWidth, videoHeight, fps):
+        self.__sceneAnimator = sceneAnimator
+        self.__videoWidth = videoWidth
+        self.__videoHeight = videoHeight
+        self.__fps = fps
+        self.__text = Text(text=message, org=[x, y], fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=3,
+                      colour=(0, 0, 255), drawProportion=0, progressiveDrawMode='letterByLetter', insertCursorThickness=5,
+                      frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+    def drawInText(self, startTime, drawDuration, holdDuration):
+        drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                startDrawProportion=0, endDrawProportion=1,
+                                                startTime=startTime,
+                                                endTime=startTime + drawDuration,
+                                                fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+        holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                                startDrawProportion=1, endDrawProportion=1,
+                                                startTime=startTime + drawDuration,
+                                                endTime=startTime + drawDuration + holdDuration,
+                                                fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+        drawAnimation.addPrimitive(self.__text)
+        holdAnimation.addPrimitive(self.__text)
+        self.__sceneAnimator.addPrimitiveAnimation(drawAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
+
+    def drawOutText(self, startTime, vanishDuration):
+        vanishAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=1, endDrawProportion=0,
+                                           startTime=startTime,
+                                           endTime=startTime + vanishDuration,
+                                           fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+
+        vanishAnimation.addPrimitive(self.__text)
+        self.__sceneAnimator.addPrimitiveAnimation(vanishAnimation)
+
+
 videoWidth = 3840
 videoHeight = 2160
 fps = 30
 videoDuration = 15
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration, outputFile='3test.mp4')
+
+# Turn messages
 
 smallDemoBoard1 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=0.5, y=0.5, squareWidth=0.0333,
                                  pieceLayout=[['white_rook',None,None],
