@@ -14,7 +14,7 @@ class BranchInfo:
 class SmallDemoBoard:
     def __init__(self, sceneAnimator, x, y, squareWidth, pieceLayout, text, branchInfoList,
                  horizontalSpacingBetweenLines, verticalSpacingBetweenBoards, squareCoordinateTextScale, mainTextScale,
-                 videoWidth, videoHeight, xPerimeterSpacingFromTop, traceBackLineColour=(0, 255, 0), ):
+                 videoWidth, videoHeight, xPerimeterSpacingFromTop, traceBackLineColour=(0, 255, 0), dashedBranch=False, dashedBranchLengthProportion=1, dashedBranchTextProportion=1):
         self.__sceneAnimator = sceneAnimator
         self.__x = x
         self.__y = y
@@ -29,6 +29,9 @@ class SmallDemoBoard:
         self.__videoHeight = videoHeight
         self.__traceBackLineColour = traceBackLineColour
         self.__xPerimeterSpacingFromTop = xPerimeterSpacingFromTop
+        self.__dashedBranch = dashedBranch
+        self.__dashedBranchLengthProportion = dashedBranchLengthProportion
+        self.__dashedBranchTextProportion = dashedBranchTextProportion
 
 
         boardTopLeftX = x - 1.5 * self.__squareWidth
@@ -155,6 +158,36 @@ class SmallDemoBoard:
             startXdestination = branchIntersectionX - math.floor(
                 len(branchInfoList) / 2) * horizontalSpacingBetweenLines
 
+
+        if self.__dashedBranch:
+            branchXdestinationPrior = startXdestination + (len(self.__branchInfoList) - 1) * horizontalSpacingBetweenLines
+            branchXdestination = startXdestination + (len(self.__branchInfoList) + 3) * horizontalSpacingBetweenLines
+
+            aDash = ySpacingFromTopLeft
+
+            o = branchXdestinationPrior - branchIntersectionX
+            a = branchYdestination - branchIntersectionY
+
+            branchXOrigin = branchIntersectionX + aDash * (o / a)
+            branchYOrigin = branchIntersectionY + ySpacingFromTopLeft
+            self.__branchesPrimitives.append(DashedLine(
+                pt1=[branchXOrigin, branchYOrigin],
+                pt2=[branchXOrigin + (branchXdestination - branchXOrigin) *  self.__dashedBranchLengthProportion, branchYOrigin + (branchYdestination - branchYOrigin) *  self.__dashedBranchLengthProportion],
+                colour=(255, 255, 255), thickness=5, drawProportion=0, frameWidth=videoWidth,
+                frameHeight=videoHeight))
+
+
+            effectiveProportion = self.__dashedBranchTextProportion * self.__dashedBranchLengthProportion
+
+            textX = branchXOrigin + (branchXdestination - branchXOrigin) * effectiveProportion
+            textY = branchYOrigin + (branchYdestination - branchYOrigin) * effectiveProportion
+            self.__branchesPrimitives.append(
+                Text(text="Other moves", org=[textX, textY], fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1,
+                     colour=(255, 255, 255), drawProportion=0, progressiveDrawMode='letterByLetter',
+                     insertCursorThickness=5,
+                     frameWidth=videoWidth, frameHeight=videoHeight, drawOverElementsBehind=True))
+
+
         for i, branchInfo in enumerate(self.__branchInfoList):
             branchXdestination = startXdestination + i * horizontalSpacingBetweenLines
 
@@ -194,6 +227,9 @@ class SmallDemoBoard:
                 pt2=[branchXOrigin, branchYOrigin],
                 colour=self.__traceBackLineColour, thickness=10, drawProportion=0, frameWidth=videoWidth,
                 frameHeight=videoHeight))
+
+
+
 
     def drawInTraceBack(self, startTime, drawDuration, holdDuration, lineIndex):
         drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
@@ -438,18 +474,17 @@ fps = 30
 videoDuration = 60
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration,
                                outputFile='3g-minimax.mp4')
+textX = 0.075
 # Board positions
 board1x = 0.5
 board1y = 0.15
 # Turns
-white1 = Message(sceneAnimator=sceneAnimator, x=0.1, y=0.15, message='Whites Turn', colour=(255,255,255), videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
-black1 = Message(sceneAnimator=sceneAnimator, x=0.6, y=0.5, message='Blacks Turn', colour=(255,255,255), videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
-white2 = Message(sceneAnimator=sceneAnimator, x=0.6, y=0.5, message='Whites Turn', colour=(255,255,255), videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+white1 = Message(sceneAnimator=sceneAnimator, x=textX, y=board1y, message='Whites Turn', colour=(255,255,255), videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
 
 squareWidth = 1 / (4*12)
 xPerimeterSpacingFromTop = squareWidth/2
 
-depth0horizontalSpacingBetweenLines=1/2
+depth0horizontalSpacingBetweenLines=0.5
 depth0verticalSpacingBetweenBoards=1.5 * squareWidth * (videoWidth / videoHeight)
 
 depth1horizontalSpacingBetweenLinesA=0.1
@@ -464,15 +499,18 @@ smallDemoBoard1 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board1x, y=board
                                               ['black_queen', None, 'white_rook'],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)
+                                 branchInfoList=[BranchInfo('c3->b1', 'solid', 0.6),
+                                                 BranchInfo('c2->a2', 'solid', 0.6)
                                                  ],
                                  horizontalSpacingBetweenLines=depth0horizontalSpacingBetweenLines,
                                  verticalSpacingBetweenBoards=depth0verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
                                  mainTextScale=1,
                                  xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
-                                 videoWidth=videoWidth, videoHeight=videoHeight)
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.125,
+                                 dashedBranchTextProportion=1)
 
 
 smallDemoBoard2 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board1x, y=board1y, squareWidth=squareWidth,
@@ -480,28 +518,36 @@ smallDemoBoard2 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board1x, y=board
                                               ['black_queen', None, 'white_rook'],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c1 to c2', 'solid', 0.6),
-                                                 BranchInfo('b1 to a2', 'solid', 0.6)],
+                                 branchInfoList=[BranchInfo('c1->c2', 'solid', 0.6),
+                                                 BranchInfo('b1->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth1horizontalSpacingBetweenLinesB,
                                  verticalSpacingBetweenBoards=depth1verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
                                  mainTextScale=1,
                                  xPerimeterSpacingFromTop=squareWidth/2,
-                                 videoWidth=videoWidth, videoHeight=videoHeight)
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.15,
+                                 dashedBranchTextProportion=1
+                                 )
 
 smallDemoBoard3 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board1x, y=board1y, squareWidth=squareWidth,
                                  pieceLayout=[[None, 'black_bishop', 'black_king'],
                                               ['black_queen', None, 'white_rook'],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('a2 to a3', 'solid', 0.6),
-                                                 BranchInfo('c1 to c2', 'solid', 0.6)],
+                                 branchInfoList=[BranchInfo('a2->a3', 'solid', 0.6),
+                                                 BranchInfo('c1->c2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth1horizontalSpacingBetweenLinesA,
                                  verticalSpacingBetweenBoards=depth1verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
                                  mainTextScale=1,
                                  xPerimeterSpacingFromTop=squareWidth/2,
-                                 videoWidth=videoWidth, videoHeight=videoHeight)
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.3,
+                                 dashedBranchTextProportion=1
+                                 )
 
 
 
@@ -566,52 +612,63 @@ smallDemoBoard4 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board4And5x, y=b
                                               ['white_rook', None, None],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
-                                 horizontalSpacingBetweenLines=0.1,
-                                 verticalSpacingBetweenBoards=0.1,
+                                 branchInfoList=[BranchInfo('c2->a2', 'solid', 0.6),
+                                                 BranchInfo('a3->b3', 'solid', 0.6)],
+                                 horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
+                                 verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
                                  mainTextScale=1,
                                  xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
-                                 videoWidth=videoWidth, videoHeight=videoHeight)
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.35,
+                                 dashedBranchTextProportion=1
+                                 )
 
 smallDemoBoard5 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board4And5x, y=board4And5y, squareWidth=squareWidth,
                                  pieceLayout=[[None, 'black_bishop', 'black_king'],
                                               ['white_rook', None, None],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
-                                 horizontalSpacingBetweenLines=0.1,
-                                 verticalSpacingBetweenBoards=0.1,
+                                 branchInfoList=[BranchInfo('a2->c2', 'solid', 0.6),
+                                                 BranchInfo('c3->b1', 'solid', 0.6)],
+                                 horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
+                                 verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
                                  mainTextScale=1,
                                  xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
-                                 videoWidth=videoWidth, videoHeight=videoHeight)
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.35,
+                                 dashedBranchTextProportion=1
+                                 )
 
 smallDemoBoard6 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board6And7x, y=board6And7y, squareWidth=squareWidth,
                                  pieceLayout=[[None, 'white_knight', 'black_king'],
                                               ['black_queen', None, 'white_rook'],
                                               ['white_king', None, None]],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
-                                 horizontalSpacingBetweenLines=0.1,
-                                 verticalSpacingBetweenBoards=0.1,
+                                 branchInfoList=[BranchInfo('a3->a2', 'solid', 0.6),
+                                                 BranchInfo('a3->b3', 'solid', 0.6)],
+                                 horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
+                                 verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
                                  mainTextScale=1,
                                  xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
-                                 videoWidth=videoWidth, videoHeight=videoHeight)
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.35,
+                                 dashedBranchTextProportion=1
+                                 )
 
 smallDemoBoard7 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board6And7x, y=board6And7y, squareWidth=squareWidth,
                                  pieceLayout=[[None, 'white_knight', 'black_king'],
                                               ['black_queen', None, 'white_rook'],
                                               ['white_king', None, None]],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
-                                 horizontalSpacingBetweenLines=0.1,
-                                 verticalSpacingBetweenBoards=0.1,
+                                 branchInfoList=[],
+                                 horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
+                                 verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
                                  mainTextScale=1,
                                  xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
@@ -619,6 +676,11 @@ smallDemoBoard7 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board6And7x, y=b
 
 # draw in board 4,5,6 and 7
 drawDuration = .5
+
+black1 = Message(sceneAnimator=sceneAnimator, x=textX, y=board4And5y, message='Blacks Turn', colour=(255,255,255), videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+black1.drawInText(startTime=currentTimeInAnimation,drawDuration=drawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawDuration
+
 smallDemoBoard4.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard4.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard4.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
@@ -638,7 +700,8 @@ smallDemoBoard7.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration
 smallDemoBoard7.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard7.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
-currentTimeInAnimation += drawDuration
+
+
 
 # board 7 move to place
 moveDuration = 2
@@ -703,12 +766,12 @@ board13And12y = board6And7y + board6yDelta + 0.003
 
 
 smallDemoBoard8 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board9And8x, y=board9And8y, squareWidth=squareWidth,
-                                 pieceLayout=[[None, 'black_bishop', 'black_king'],
-                                              ['white_rook', None, None],
+                                 pieceLayout=[[None, None, 'black_king'],
+                                              ['black_bishop', None, None],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
+                                 branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
+                                                 BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
                                  verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
@@ -717,12 +780,12 @@ smallDemoBoard8 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board9And8x, y=b
                                  videoWidth=videoWidth, videoHeight=videoHeight)
 
 smallDemoBoard9 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board9And8x, y=board9And8y, squareWidth=squareWidth,
-                                 pieceLayout=[[None, 'black_bishop', 'black_king'],
-                                              ['white_rook', None, None],
+                                 pieceLayout=[[None, None, 'black_king'],
+                                              ['black_bishop', None, None],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
+                                 branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
+                                                 BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
                                  verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
@@ -731,12 +794,12 @@ smallDemoBoard9 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board9And8x, y=b
                                  videoWidth=videoWidth, videoHeight=videoHeight)
 
 smallDemoBoard10 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board11And10x, y=board11And10y, squareWidth=squareWidth,
-                                 pieceLayout=[[None, 'black_bishop', 'black_king'],
-                                              ['white_rook', None, None],
+                                 pieceLayout=[[None, 'black_bishop', None],
+                                              ['white_rook', None, 'black_king'],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
+                                 branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
+                                                 BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
                                  verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
@@ -745,12 +808,12 @@ smallDemoBoard10 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board11And10x, 
                                  videoWidth=videoWidth, videoHeight=videoHeight)
 
 smallDemoBoard11 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board11And10x, y=board11And10y, squareWidth=squareWidth,
-                                 pieceLayout=[[None, 'black_bishop', 'black_king'],
-                                              ['white_rook', None, None],
+                                 pieceLayout=[[None, 'black_bishop', None],
+                                              ['white_rook', None, 'black_king'],
                                               ['white_king', None, 'white_knight']],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
+                                 branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
+                                                 BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
                                  verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
@@ -759,12 +822,12 @@ smallDemoBoard11 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board11And10x, 
                                  videoWidth=videoWidth, videoHeight=videoHeight)
 
 smallDemoBoard12 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board13And12x, y=board13And12y, squareWidth=squareWidth,
-                                 pieceLayout=[[None, 'black_bishop', 'black_king'],
-                                              ['white_rook', None, None],
-                                              ['white_king', None, 'white_knight']],
+                                 pieceLayout=[[None, 'white_knight', None],
+                                              ['black_queen', None, 'black_king'],
+                                              ['white_king', None, None ]],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
+                                 branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
+                                                 BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
                                  verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
@@ -773,12 +836,12 @@ smallDemoBoard12 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board13And12x, 
                                  videoWidth=videoWidth, videoHeight=videoHeight)
 
 smallDemoBoard13 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board13And12x, y=board13And12y, squareWidth=squareWidth,
-                                 pieceLayout=[[None, 'black_bishop', 'black_king'],
-                                              ['white_rook', None, None],
-                                              ['white_king', None, 'white_knight']],
+                                 pieceLayout=[[None, 'white_knight', None],
+                                              ['white_rook', None, 'black_king'],
+                                              ['white_king', None, None ]],
                                  text="TEST TEXT",
-                                 branchInfoList=[BranchInfo('c3 to b3', 'solid', 0.6),
-                                                 BranchInfo('c2 to a2', 'solid', 0.6)],
+                                 branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
+                                                 BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
                                  verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
                                  squareCoordinateTextScale=1,
@@ -817,13 +880,15 @@ smallDemoBoard13.drawInPieces(startTime=currentTimeInAnimation, drawDuration=dra
 smallDemoBoard13.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
 
+white2 = Message(sceneAnimator=sceneAnimator, x=textX, y=board9And8y, message='Whites Turn', colour=(255,255,255), videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
 
+white2.drawInText(startTime=currentTimeInAnimation,drawDuration=drawDuration, holdDuration=videoDuration)
 
 currentTimeInAnimation += drawDuration
 
 # board 13 move to place
 moveDuration = 2
-smallDemoBoard13.movePiece(startX=0, startY=2, endX=1, endY=2, startTime=currentTimeInAnimation, duration=moveDuration)
+smallDemoBoard13.movePiece(startX=0, startY=2, endX=0, endY=1, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
 boardMoveDuration = 2
 board13xDelta = -depth2horizontalSpacingBetweenLines
@@ -843,7 +908,7 @@ currentTimeInAnimation += boardMoveDuration
 
 # board 11 move to place
 moveDuration = 2
-smallDemoBoard11.movePiece(startX=0, startY=2, endX=1, endY=2, startTime=currentTimeInAnimation, duration=moveDuration)
+smallDemoBoard11.movePiece(startX=0, startY=1, endX=2, endY=1, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
 boardMoveDuration = 2
 board11xDelta = -depth2horizontalSpacingBetweenLines
@@ -853,7 +918,7 @@ currentTimeInAnimation += boardMoveDuration
 
 # board 10 move to place
 moveDuration = 2
-smallDemoBoard10.movePiece(startX=0, startY=2, endX=1, endY=2, startTime=currentTimeInAnimation, duration=moveDuration)
+smallDemoBoard10.movePiece(startX=2, startY=2, endX=1, endY=0, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
 boardMoveDuration = 2
 board10xDelta = depth2horizontalSpacingBetweenLines
@@ -863,7 +928,7 @@ currentTimeInAnimation += boardMoveDuration
 
 # board 9 move to place
 moveDuration = 2
-smallDemoBoard9.movePiece(startX=0, startY=2, endX=1, endY=2, startTime=currentTimeInAnimation, duration=moveDuration)
+smallDemoBoard9.movePiece(startX=2, startY=2, endX=0, endY=1, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
 boardMoveDuration = 2
 board9xDelta = -depth2horizontalSpacingBetweenLines
@@ -884,8 +949,11 @@ currentTimeInAnimation += boardMoveDuration
 
 # Draw in branches down to 3 depth
 branchDrawDuration = 2
-smallDemoBoard3.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
-smallDemoBoard2.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+smallDemoBoard4.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+smallDemoBoard5.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+smallDemoBoard6.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+smallDemoBoard7.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+
 currentTimeInAnimation += branchDrawDuration
 
 
