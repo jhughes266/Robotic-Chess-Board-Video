@@ -52,8 +52,8 @@ class SmallDemoBoard:
                                                                                  outlineBottomRightY],
                                                                             drawProportion=0,
                                                                             firstColour=(255, 255, 255),
-                                                                            secondColour=(0, 0, 255),
-                                                                            thirdColour=(0, 0, 255),
+                                                                            secondColour=(255, 0, 255),
+                                                                            thirdColour=(255, 0, 255),
                                                                             frameWidth=videoWidth,
                                                                             frameHeight=videoHeight, thickness=5))
 
@@ -470,8 +470,8 @@ class Message:
 
 videoWidth = 3840
 videoHeight = 2160
-fps = 30
-videoDuration = 60
+fps = 45
+videoDuration = 75
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration,
                                outputFile='3g-minimax.mp4')
 textX = 0.075
@@ -769,7 +769,7 @@ smallDemoBoard8 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board9And8x, y=b
                                  pieceLayout=[[None, None, 'black_king'],
                                               ['black_bishop', None, None],
                                               ['white_king', None, 'white_knight']],
-                                 text="TEST TEXT",
+                                 text="Value: 0",
                                  branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
                                                  BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
@@ -783,7 +783,7 @@ smallDemoBoard9 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board9And8x, y=b
                                  pieceLayout=[[None, None, 'black_king'],
                                               ['black_bishop', None, None],
                                               ['white_king', None, 'white_knight']],
-                                 text="TEST TEXT",
+                                 text="Value: 3",
                                  branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
                                                  BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
@@ -797,7 +797,7 @@ smallDemoBoard10 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board11And10x, 
                                  pieceLayout=[[None, 'black_bishop', None],
                                               ['white_rook', None, 'black_king'],
                                               ['white_king', None, 'white_knight']],
-                                 text="TEST TEXT",
+                                 text="Value: 8",
                                  branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
                                                  BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
@@ -811,7 +811,7 @@ smallDemoBoard11 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board11And10x, 
                                  pieceLayout=[[None, 'black_bishop', None],
                                               ['white_rook', None, 'black_king'],
                                               ['white_king', None, 'white_knight']],
-                                 text="TEST TEXT",
+                                 text="Value: 10,005",
                                  branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
                                                  BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
@@ -825,7 +825,7 @@ smallDemoBoard12 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board13And12x, 
                                  pieceLayout=[[None, 'white_knight', None],
                                               ['black_queen', None, 'black_king'],
                                               ['white_king', None, None ]],
-                                 text="TEST TEXT",
+                                 text="Value: -6",
                                  branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
                                                  BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
@@ -839,7 +839,7 @@ smallDemoBoard13 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board13And12x, 
                                  pieceLayout=[[None, 'white_knight', None],
                                               ['white_rook', None, 'black_king'],
                                               ['white_king', None, None ]],
-                                 text="TEST TEXT",
+                                 text="Value: 3",
                                  branchInfoList=[BranchInfo('c3->b3', 'solid', 0.6),
                                                  BranchInfo('c2->a2', 'solid', 0.6)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
@@ -850,34 +850,36 @@ smallDemoBoard13 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board13And12x, 
                                  videoWidth=videoWidth, videoHeight=videoHeight)
 # draw in board 8,9,10,11,12,13
 drawDuration = .5
+timeUntilFinalPositionHighlight = 26
+finalPositionOutLineDrawInFinished = currentTimeInAnimation + drawDuration
 smallDemoBoard8.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard8.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
-smallDemoBoard8.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+smallDemoBoard8.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=timeUntilFinalPositionHighlight, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
 
 smallDemoBoard9.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard9.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
-smallDemoBoard9.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+smallDemoBoard9.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=timeUntilFinalPositionHighlight, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
 
 smallDemoBoard10.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard10.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
-smallDemoBoard10.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+smallDemoBoard10.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=timeUntilFinalPositionHighlight, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
 
 smallDemoBoard11.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard11.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
-smallDemoBoard11.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+smallDemoBoard11.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=timeUntilFinalPositionHighlight, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
 
 smallDemoBoard12.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard12.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
-smallDemoBoard12.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+smallDemoBoard12.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=timeUntilFinalPositionHighlight, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
 
 smallDemoBoard13.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard13.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
-smallDemoBoard13.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+smallDemoBoard13.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=timeUntilFinalPositionHighlight, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
 
 white2 = Message(sceneAnimator=sceneAnimator, x=textX, y=board9And8y, message='Whites Turn', colour=(255,255,255), videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
@@ -955,6 +957,56 @@ smallDemoBoard6.drawInBranches(startTime=currentTimeInAnimation, drawDuration=br
 smallDemoBoard7.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
 
 currentTimeInAnimation += branchDrawDuration
+print(f"The current animation time is {currentTimeInAnimation}.\nThe outline finished drawing at {finalPositionOutLineDrawInFinished}.\nThe 'timeUntilFinalPositionHighlight' should be set to {currentTimeInAnimation - finalPositionOutLineDrawInFinished}.")
+
+
+# Make the final positions flash pink
+numberOfFlashes = 5
+cycleDuration = 1
+for i in range(numberOfFlashes):
+    holdDuration = cycleDuration/2
+    smallDemoBoard8.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=cycleDuration/2, holdDuration=holdDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
+    smallDemoBoard9.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=cycleDuration/2, holdDuration=holdDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
+    smallDemoBoard10.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=cycleDuration/2, holdDuration=holdDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
+    smallDemoBoard11.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=cycleDuration/2, holdDuration=holdDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
+    smallDemoBoard12.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=cycleDuration/2, holdDuration=holdDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
+    smallDemoBoard13.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=cycleDuration/2, holdDuration=holdDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
+
+    if i + 1 == numberOfFlashes:
+        holdDuration=videoDuration
+    smallDemoBoard8.drawInBoardOutline(startTime=currentTimeInAnimation+cycleDuration/2, drawDuration=cycleDuration/2, holdDuration=holdDuration,
+                                       startDrawProportion=0.66666, endDrawProportion=0.33333)
+    smallDemoBoard9.drawInBoardOutline(startTime=currentTimeInAnimation+cycleDuration/2, drawDuration=cycleDuration/2, holdDuration=holdDuration,
+                                       startDrawProportion=0.66666, endDrawProportion=0.33333)
+    smallDemoBoard10.drawInBoardOutline(startTime=currentTimeInAnimation+cycleDuration/2, drawDuration=cycleDuration/2, holdDuration=holdDuration,
+                                        startDrawProportion=0.66666, endDrawProportion=0.33333)
+    smallDemoBoard11.drawInBoardOutline(startTime=currentTimeInAnimation+cycleDuration/2, drawDuration=cycleDuration/2, holdDuration=holdDuration,
+                                        startDrawProportion=0.66666, endDrawProportion=0.33333)
+    smallDemoBoard12.drawInBoardOutline(startTime=currentTimeInAnimation+cycleDuration/2, drawDuration=cycleDuration/2, holdDuration=holdDuration,
+                                        startDrawProportion=0.66666, endDrawProportion=0.33333)
+    smallDemoBoard13.drawInBoardOutline(startTime=currentTimeInAnimation+cycleDuration/2, drawDuration=cycleDuration/2, holdDuration=holdDuration,
+                                        startDrawProportion=0.66666, endDrawProportion=0.33333)
+
+    currentTimeInAnimation += cycleDuration
+
+
+# Draw in the final position values
+textDrawDuration = 1
+currentTimeInAnimation += 1
+
+smallDemoBoard13.drawInMainText(startTime=currentTimeInAnimation, drawDuration=textDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += 1
+smallDemoBoard12.drawInMainText(startTime=currentTimeInAnimation, drawDuration=textDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += 1
+smallDemoBoard11.drawInMainText(startTime=currentTimeInAnimation, drawDuration=textDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += 1
+smallDemoBoard10.drawInMainText(startTime=currentTimeInAnimation, drawDuration=textDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += 1
+smallDemoBoard9.drawInMainText(startTime=currentTimeInAnimation, drawDuration=textDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += 1
+smallDemoBoard8.drawInMainText(startTime=currentTimeInAnimation, drawDuration=textDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += 1
+print(currentTimeInAnimation)
 
 
 
