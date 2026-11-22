@@ -500,10 +500,10 @@ class Image(PrimitiveElement):
             #location of the black and white pixels
             whiteMask = np.where(np.sum(np.where(newImage == 255, 1, 0), axis=2) == 3, 1, 0)
             blackMask = np.where(np.sum(np.where(newImage == 0, 1, 0), axis=2) == 3, 1, 0)
-            # sum masks any element that equals 1 corresponds to a black pixel
+            # sum masks any element that equals 1 corresponds to a black pixel or white pixel
             totalMask = blackMask + whiteMask
             # create a 3d mask with each channel identical. It means any element that is 1 we want to keep and any that
-            # is zero becomes the backgroun
+            # is zero becomes the background
             totalMask3d = np.ones_like(newImage)
             totalMask3d[:,:, 0] = totalMask
             totalMask3d[:, :, 1] = totalMask
@@ -522,6 +522,92 @@ class Image(PrimitiveElement):
 
 
         frame[int(topLeft[1]): (int(topLeft[1]) + newPixelHeight), int(topLeft[0]): (int(topLeft[0]) + newPixelWidth)] = propNewImage
+
+
+
+
+
+class NewImage(PrimitiveElement):
+    def __init__(self, topLeft, imgPath, imageWidth, frameWidth, frameHeight, colour=None, backgroundColour=(0,0,0), drawProportion=1, maxNumBlurs = 1, onlyKeepMonoChrome = False):
+        super().__init__(position=topLeft,colour=colour, drawProportion=drawProportion, frameWidth=frameWidth, frameHeight=frameHeight)
+        self.__imgPath = imgPath
+        self.__image = cv2.imread(imgPath)
+        self.__imageWidth = imageWidth
+        self.__backgroundColour = backgroundColour
+        self.__maxNumBlurs = maxNumBlurs
+        self.__onlyKeepMonoChrome = onlyKeepMonoChrome
+
+    def updatePosition(self, delta):
+        # x, y switch because of slicing
+        self._position[1] += delta[1]
+        self._position[0] += delta[0]
+
+    def draw(self, frame):
+        if self._drawProportion == 0:
+            return
+
+        topLeft = self._position
+
+        newPixelWidth = int(frame.shape[1] * self.__imageWidth)
+        oldPixelWidth = self.__image.shape[1]
+        newPixelHeight = int((newPixelWidth / oldPixelWidth) * self.__image.shape[0])
+
+        # Checking to see if the image crosses over any of the borders and then drawing it partially if it does.
+        topLeftX = int(topLeft[0])
+        topLeftY = int(topLeft[1])
+        bottomRightX = int(topLeft[0] + newPixelWidth)
+        bottomRightY = int(topLeft[1] + newPixelHeight)
+
+        newImage = cv2.resize(self.__image, (newPixelWidth, newPixelHeight))
+
+        newImageTopLeftX = 0
+        newImageTopLeftY = 0
+        newImageBottomRightX = newPixelWidth
+        newImageBottomRightY = newPixelHeight
+
+        if topLeftX < 0:
+            newImageTopLeftX = 0 + abs(topLeftX)
+            topLeftX = 0
+
+
+        if topLeftY < 0:
+            pass
+
+        if bottomRightX >= self._frameWidth:
+            pass
+
+        if bottomRightY >= self._frameHeight:
+            pass
+
+        frameDrawSection = frame[topLeftY: bottomRightY, topLeftX: bottomRightX]
+        newImage = newImage[newImageTopLeftY: newImageBottomRightY, newImageTopLeftX: newImageBottomRightX]
+
+        if self.__onlyKeepMonoChrome:
+            #location of the black and white pixels
+            whiteMask = np.where(np.sum(np.where(newImage == 255, 1, 0), axis=2) == 3, 1, 0)
+            blackMask = np.where(np.sum(np.where(newImage == 0, 1, 0), axis=2) == 3, 1, 0)
+            # sum masks any element that equals 1 corresponds to a black pixel or white pixel
+            totalMask = blackMask + whiteMask
+            # create a 3d mask with each channel identical. It means any element that is 1 we want to keep and any that
+            # is zero becomes the background
+            totalMask3d = np.ones_like(newImage)
+            totalMask3d[:,:, 0] = totalMask
+            totalMask3d[:, :, 1] = totalMask
+            totalMask3d[:, :, 2] = totalMask
+            # any element that is included and any that is zero becomes the background
+            newImage = np.where(totalMask3d == 1, newImage * self._drawProportion, frameDrawSection)
+
+        difference = newImage - frameDrawSection
+
+        propDifference = difference * self._drawProportion
+
+        propNewImage = propDifference + frameDrawSection
+
+        for i in range(int(self.__maxNumBlurs - self._drawProportion * self.__maxNumBlurs)):
+            propNewImage = cv2.blur(propNewImage, (10,10))
+
+
+        frame[topLeftY: bottomRightY, topLeftX: bottomRightX] = propNewImage
 
 
 
