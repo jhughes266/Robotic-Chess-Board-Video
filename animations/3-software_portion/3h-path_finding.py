@@ -535,7 +535,7 @@ class EntireAnimationMover:
 videoWidth = int(3840)
 videoHeight = int(2160)
 fps = 30
-videoDuration = 60
+videoDuration = 85
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration,
                                outputFile='3h-path_finding.mp4')
 
@@ -907,7 +907,7 @@ smallDemoBoard9 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board8And9x, y=b
                                  xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
                                  videoWidth=videoWidth, videoHeight=videoHeight,
                                  dashedBranch=True,
-                                 dashedBranchLengthProportion=0.35,
+                                 dashedBranchLengthProportion=0.15,
                                  dashedBranchTextProportion=1,
                                  firtColour=(0,255,0),
                                  secondColour=(0,0,255)
@@ -991,9 +991,10 @@ smallDemoBoard10 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board10And11x, 
                                  xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
                                  videoWidth=videoWidth, videoHeight=videoHeight,
                                  dashedBranch=True,
-                                 dashedBranchLengthProportion=0.35,
+                                 dashedBranchLengthProportion=0.15,
                                  dashedBranchTextProportion=1,
-                                 firtColour=(0,255,0)
+                                 firtColour=(0,255,0),
+                                 secondColour=(0,0,255),
                                  )
 entireAnimationMover.addEntityToMoveList(smallDemoBoard10)
 
@@ -1015,7 +1016,7 @@ smallDemoBoard11 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board10And11x, 
                                  dashedBranchTextProportion=1,
                                  firtColour=(0,255,0)
                                  )
-entireAnimationMover.addEntityToMoveList(smallDemoBoard9)
+entireAnimationMover.addEntityToMoveList(smallDemoBoard11)
 
 #Drawing in board 10 and 11
 preDrawHoldTime = 3/tempTimeDiv
@@ -1067,6 +1068,122 @@ currentTimeInAnimation += crossDrawDuration
 drawTextDuration = 1/tempTimeDiv
 smallDemoBoard10.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
 currentTimeInAnimation += drawTextDuration
+
+
+
+
+
+
+
+
+
+# Creating boards 12 and 13
+board12And13x = board10And11x + board10xDelta + 0.0035 - (9 / videoWidth)
+#added a small vertical offset as it was slightly unaligned
+board12And13y = board10And11y + board10yDelta + 0.003 - (2/ videoHeight)
+
+smallDemoBoard12 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board12And13x, y=board12And13y, squareWidth=squareWidth,
+                                 pieceLayout=[['white_pawn', 'white_knight' , None],
+                                              ['white_pawn', None , 'white_pawn'],
+                                              ['white_rook', None , 'white_bishop']],
+                                 text="Distance: 4",
+                                 branchInfoList=[BranchInfo('c2->a2', 'solid', 0.8),
+                                                 BranchInfo('a3->b3', 'solid', 0.8)],
+                                 horizontalSpacingBetweenLines=depth1horizontalSpacingBetweenLinesB,
+                                 verticalSpacingBetweenBoards=depth1verticalSpacingBetweenBoards,
+                                 squareCoordinateTextScale=1.5,
+                                 mainTextScale=1.5,
+                                 xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.35,
+                                 dashedBranchTextProportion=1,
+                                 firtColour=(0,255,0)
+                                 )
+entireAnimationMover.addEntityToMoveList(smallDemoBoard12)
+
+smallDemoBoard13 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board12And13x, y=board12And13y, squareWidth=squareWidth,
+                                  pieceLayout=[['white_pawn', 'white_knight', None],
+                                               ['white_pawn', None, 'white_pawn'],
+                                               ['white_rook', None, 'white_bishop']],
+                                  text="Distance: 2",
+                                 branchInfoList=[BranchInfo('a2->c2', 'solid', 0.8),
+                                                 BranchInfo('c3->b1', 'solid', 0.8)],
+                                 horizontalSpacingBetweenLines=depth1horizontalSpacingBetweenLinesB,
+                                 verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
+                                 squareCoordinateTextScale=1.5,
+                                 mainTextScale=1.5,
+                                 xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.15,
+                                 dashedBranchTextProportion=1,
+                                 firtColour=(0,255,0)
+                                 )
+entireAnimationMover.addEntityToMoveList(smallDemoBoard13)
+
+#Drawing in board 12 and 13
+preDrawHoldTime = 3/tempTimeDiv
+currentTimeInAnimation = currentTimeInAnimation + preDrawHoldTime
+drawDuration = 2/tempTimeDiv
+smallDemoBoard12.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard12.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard12.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+                                   endDrawProportion=0.3333)
+
+smallDemoBoard13.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard13.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard13.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+                                   endDrawProportion=0.3333)
+
+
+# Expanding board 10
+moveDuration = 2
+smallDemoBoard13.movePiece(startX=1, startY=0, endX=2, endY=0, startTime=currentTimeInAnimation, duration=moveDuration)
+currentTimeInAnimation += moveDuration
+boardMoveDuration = 2
+board13xDelta = board5xDelta
+board13yDelta = board5yDelta
+smallDemoBoard13.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board13xDelta, yDelta=board13yDelta)
+currentTimeInAnimation += boardMoveDuration
+
+smallDemoBoard12.movePiece(startX=2, startY=1, endX=2, endY=0, startTime=currentTimeInAnimation, duration=moveDuration)
+currentTimeInAnimation += moveDuration
+boardMoveDuration = 2
+board12xDelta = board4xDelta
+board12yDelta = board4yDelta
+smallDemoBoard12.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board12xDelta, yDelta=board12yDelta)
+currentTimeInAnimation += boardMoveDuration
+
+
+# change colour of board 10
+outlineDrawDuration = 2
+smallDemoBoard10.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=outlineDrawDuration, holdDuration=videoDuration, startDrawProportion=0.6666, endDrawProportion=1)
+currentTimeInAnimation += outlineDrawDuration
+# Draw in the branches
+branchDrawDuration = 2/tempTimeDiv
+smallDemoBoard10.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += branchDrawDuration
+
+
+# Draw in distance of non-crossed boards
+drawTextDuration = 1/tempTimeDiv
+smallDemoBoard13.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawTextDuration
+
+drawTextDuration = 1/tempTimeDiv
+smallDemoBoard12.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawTextDuration
+
+
+
+
+
+
+
+
+
+
 
 
 
