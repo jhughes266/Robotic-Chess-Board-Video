@@ -555,6 +555,10 @@ class NewImage(PrimitiveElement):
         # Checking to see if the image crosses over any of the borders and then drawing it partially if it does.
         topLeftX = int(topLeft[0])
         topLeftY = int(topLeft[1])
+
+        if topLeftX < 0:
+            print("Debug")
+
         bottomRightX = int(topLeft[0] + newPixelWidth)
         bottomRightY = int(topLeft[1] + newPixelHeight)
 
@@ -565,19 +569,27 @@ class NewImage(PrimitiveElement):
         newImageBottomRightX = newPixelWidth
         newImageBottomRightY = newPixelHeight
 
+        # The image being draw has no part of it inside the frame
+        if topLeftX >= self._frameWidth or topLeftY >= self._frameHeight or bottomRightX < 0 or bottomRightY < 0:
+            return
+
         if topLeftX < 0:
-            newImageTopLeftX = 0 + abs(topLeftX)
+            newImageTopLeftX = abs(topLeftX) + 1
             topLeftX = 0
 
 
         if topLeftY < 0:
-            pass
+            newImageTopLeftY = abs(topLeftY) + 1
+            topLeftY = 0
 
         if bottomRightX >= self._frameWidth:
-            pass
+            newImageBottomRightX = newImageTopLeftX + (self._frameWidth - topLeftX)
+            bottomRightX = self._frameWidth
 
         if bottomRightY >= self._frameHeight:
-            pass
+            newImageBottomRightY = newImageTopLeftY + (self._frameHeight - topLeftY)
+            bottomRightY = self._frameHeight
+
 
         frameDrawSection = frame[topLeftY: bottomRightY, topLeftX: bottomRightX]
         newImage = newImage[newImageTopLeftY: newImageBottomRightY, newImageTopLeftX: newImageBottomRightX]
