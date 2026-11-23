@@ -546,7 +546,9 @@ class NewImage(PrimitiveElement):
         if self._drawProportion == 0:
             return
 
-        topLeft = self._position
+
+        topLeft = copy.deepcopy(self._position)
+        topLeft[1] = int(topLeft[1])
 
         newPixelWidth = int(frame.shape[1] * self.__imageWidth)
         oldPixelWidth = self.__image.shape[1]
@@ -556,8 +558,8 @@ class NewImage(PrimitiveElement):
         topLeftX = int(topLeft[0])
         topLeftY = int(topLeft[1])
 
-        if topLeftX < 0:
-            print("Debug")
+        #if topLeftX < 0 or topLeftY < 0:
+        #    print("Debug")
 
         bottomRightX = int(topLeft[0] + newPixelWidth)
         bottomRightY = int(topLeft[1] + newPixelHeight)
@@ -574,12 +576,12 @@ class NewImage(PrimitiveElement):
             return
 
         if topLeftX < 0:
-            newImageTopLeftX = abs(topLeftX) + 1
+            newImageTopLeftX = abs(topLeftX)
             topLeftX = 0
 
 
         if topLeftY < 0:
-            newImageTopLeftY = abs(topLeftY) + 1
+            newImageTopLeftY = abs(topLeftY)
             topLeftY = 0
 
         if bottomRightX >= self._frameWidth:

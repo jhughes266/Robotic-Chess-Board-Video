@@ -86,7 +86,7 @@ class SmallDemoBoard:
 
         # square coordinate text
         columnNames = ['a', 'b', 'c']
-        rowNames = ['1', '2', '3']
+        rowNames = ['3', '2', '1']
         columnY = y + 1.5 * self.__squareHeight + ySpacingFromTopLeft / 2
         for i, columnName in enumerate(columnNames):
             columnX = x - self.__squareWidth + i * self.__squareWidth
