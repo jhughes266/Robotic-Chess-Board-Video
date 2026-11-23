@@ -14,7 +14,7 @@ class BranchInfo:
 class SmallDemoBoard:
     def __init__(self, sceneAnimator, x, y, squareWidth, pieceLayout, text, branchInfoList,
                  horizontalSpacingBetweenLines, verticalSpacingBetweenBoards, squareCoordinateTextScale, mainTextScale,
-                 videoWidth, videoHeight, xPerimeterSpacingFromTop, traceBackLineColour=(0, 255, 0), dashedBranch=False, dashedBranchLengthProportion=1, dashedBranchTextProportion=1, firtColour=(255,255,255), secondColour=(0,255,0), thirdColour=(0,0,255)):
+                 videoWidth, videoHeight, xPerimeterSpacingFromTop, traceBackLineColour=(0, 255, 0), dashedBranch=False, dashedBranchLengthProportion=1, dashedBranchTextProportion=1, firtColour=(255,255,255), secondColour=(0,255,0), thirdColour=(0,0,255), boardCrossThickness=20):
         self.__sceneAnimator = sceneAnimator
         self.__x = x
         self.__y = y
@@ -56,6 +56,25 @@ class SmallDemoBoard:
                                                                             thirdColour=thirdColour,
                                                                             frameWidth=videoWidth,
                                                                             frameHeight=videoHeight, thickness=5))
+
+        # Cross Out
+        self.__boardCrossOutPrimitives = []
+        self.__boardCrossOutPrimitives.append(Line(pt1=[outlineTopLeftX, outlineTopLeftY],
+                                                   pt2=[outlineBottomRightX, outlineBottomRightY],
+                                                   colour=(0, 0, 255),
+                                                   thickness=boardCrossThickness,
+                                                   drawProportion=0,
+                                                   frameWidth=videoWidth,
+                                                   frameHeight=videoHeight))
+
+        self.__boardCrossOutPrimitives.append(Line(pt1=[outlineTopLeftX, outlineBottomRightY],
+                                                   pt2=[outlineBottomRightX, outlineTopLeftY],
+                                                   colour=(0, 0, 255),
+                                                   thickness=boardCrossThickness,
+                                                   drawProportion=0,
+                                                   frameWidth=videoWidth,
+                                                   frameHeight=videoHeight))
+
 
         # Grid squares
         self.__gridSquaresPrimitives = []
@@ -228,8 +247,24 @@ class SmallDemoBoard:
                 colour=self.__traceBackLineColour, thickness=10, drawProportion=0, frameWidth=videoWidth,
                 frameHeight=videoHeight))
 
+    def drawInCross(self, startTime, drawDuration, holdDuration):
+        drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=0, endDrawProportion=1, startTime=startTime,
+                                           endTime=startTime + drawDuration,
+                                           fps=fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
 
+        holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=1, endDrawProportion=1,
+                                           startTime=startTime + drawDuration,
+                                           endTime=startTime + drawDuration + holdDuration,
+                                           fps=fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
 
+        for primitive in self.__boardCrossOutPrimitives:
+            drawAnimation.addPrimitive(primitive)
+            holdAnimation.addPrimitive(primitive)
+
+        self.__sceneAnimator.addPrimitiveAnimation(drawAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
 
     def drawInTraceBack(self, startTime, drawDuration, holdDuration, lineIndex):
         drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
@@ -424,6 +459,9 @@ class SmallDemoBoard:
         moveAnimation.addPrimitive(self.__mainText)
         moveAnimation.addPrimitive(self.__moveableMainText)
 
+        for primitive in self.__boardCrossOutPrimitives:
+            moveAnimation.addPrimitive(primitive)
+
         self.__sceneAnimator.addPrimitiveAnimation(moveAnimation)
 
 
@@ -497,7 +535,7 @@ class EntireAnimationMover:
 videoWidth = int(3840)
 videoHeight = int(2160)
 fps = 30
-videoDuration = 40
+videoDuration = 50
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration,
                                outputFile='3h-path_finding.mp4')
 
@@ -514,7 +552,7 @@ xPerimeterSpacingFromTop = squareWidth * 0.8 #/2
 depth0horizontalSpacingBetweenLines=0.5
 depth0verticalSpacingBetweenBoards=1.5 * squareWidth * (videoWidth / videoHeight)
 
-depth1horizontalSpacingBetweenLinesA=0.1
+depth1horizontalSpacingBetweenLinesA=0.2
 depth1horizontalSpacingBetweenLinesB=0.2
 depth1verticalSpacingBetweenBoards=1.5 * squareWidth * (videoWidth / videoHeight)
 
@@ -574,7 +612,7 @@ smallDemoBoard3 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board1x, y=board
                                  xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
                                  videoWidth=videoWidth, videoHeight=videoHeight,
                                  dashedBranch=True,
-                                 dashedBranchLengthProportion=0.3,
+                                 dashedBranchLengthProportion=0.15,
                                  dashedBranchTextProportion=1)
 entireAnimationMover.addEntityToMoveList(smallDemoBoard3)
 
@@ -582,7 +620,8 @@ entireAnimationMover.addEntityToMoveList(smallDemoBoard3)
 
 currentTimeInAnimation = 0
 #Draw in the first 3 chess boards 1 will be the root the others will be transported down branches
-drawDuration = 2
+tempTimeDiv = 4
+drawDuration = 2/tempTimeDiv
 smallDemoBoard1.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard1.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard1.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
@@ -622,17 +661,17 @@ currentTimeInAnimation += boardMoveDuration
 
 
 # Draw in branches down to 1 depth
-branchDrawDuration = 2
+branchDrawDuration = 2/tempTimeDiv
 smallDemoBoard1.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
 currentTimeInAnimation += branchDrawDuration
 
 # Apply expansion and reach colouration
-outlineDrawDuration = 2
+outlineDrawDuration = 2/tempTimeDiv
 smallDemoBoard1.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=outlineDrawDuration, holdDuration=videoDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
 smallDemoBoard2.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=outlineDrawDuration, holdDuration=videoDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
 smallDemoBoard3.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=outlineDrawDuration, holdDuration=videoDuration, startDrawProportion=0.3333, endDrawProportion=0.66666)
 currentTimeInAnimation += outlineDrawDuration
-drawTextDuration = 2
+drawTextDuration = 2/tempTimeDiv
 smallDemoBoard2.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
 smallDemoBoard3.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
 
@@ -653,7 +692,7 @@ smallDemoBoard4 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board4And5x, y=b
                                  pieceLayout=[[None, 'white_pawn', None],
                                               ['white_pawn', None , 'white_pawn'],
                                               ['white_rook', 'white_knight', 'white_bishop']],
-                                 text="ALREADY REACHED!",
+                                 text="REPEAT STATE!",
                                  branchInfoList=[BranchInfo('c2->a2', 'solid', 0.8),
                                                  BranchInfo('a3->b3', 'solid', 0.8)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
@@ -665,14 +704,15 @@ smallDemoBoard4 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board4And5x, y=b
                                  dashedBranch=True,
                                  dashedBranchLengthProportion=0.35,
                                  dashedBranchTextProportion=1,
-                                 firtColour=(0,255,0)
+                                 firtColour=(0,255,0),
+                                 secondColour=(0,0,255),
                                  )
 
 smallDemoBoard5 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board4And5x, y=board4And5y, squareWidth=squareWidth,
                                  pieceLayout=[[None, 'white_pawn', None],
                                               ['white_pawn', None , 'white_pawn'],
                                               ['white_rook', 'white_knight', 'white_bishop']],
-                                 text="Distance: 4",
+                                 text="Distance: 3",
                                  branchInfoList=[BranchInfo('a2->c2', 'solid', 0.8),
                                                  BranchInfo('c3->b1', 'solid', 0.8)],
                                  horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
@@ -684,7 +724,8 @@ smallDemoBoard5 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board4And5x, y=b
                                  dashedBranch=True,
                                  dashedBranchLengthProportion=0.35,
                                  dashedBranchTextProportion=1,
-                                 firtColour=(0,255,0)
+                                 firtColour=(0,255,0),
+                                 secondColour=(0,0,255),
                                  )
 
 smallDemoBoard6 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board6And7x, y=board6And7y, squareWidth=squareWidth,
@@ -721,9 +762,9 @@ smallDemoBoard7 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board6And7x, y=b
                                  videoWidth=videoWidth, videoHeight=videoHeight)
 
 # draw in board 4,5,6 and 7
-preDrawHoldTime = 3
+preDrawHoldTime = 3/tempTimeDiv
 currentTimeInAnimation = currentTimeInAnimation + preDrawHoldTime
-drawDuration = 2
+drawDuration = 2/tempTimeDiv
 smallDemoBoard4.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard4.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard4.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
@@ -768,9 +809,152 @@ smallDemoBoard6.move(startTime=currentTimeInAnimation, duration=boardMoveDuratio
 currentTimeInAnimation += boardMoveDuration
 
 # change colour of board 3
-outlineDrawDuration = 2
+outlineDrawDuration = 2/tempTimeDiv
 smallDemoBoard3.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=outlineDrawDuration, holdDuration=videoDuration, startDrawProportion=0.6666, endDrawProportion=1)
 currentTimeInAnimation += outlineDrawDuration
+
+# Draw in the branches
+branchDrawDuration = 2/tempTimeDiv
+smallDemoBoard3.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += branchDrawDuration
+# Draw in distances
+drawTextDuration = 1/tempTimeDiv
+smallDemoBoard6.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+smallDemoBoard7.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawTextDuration
+
+
+# Expanding board 2
+# board 5 move to place
+moveDuration = 2
+smallDemoBoard5.movePiece(startX=1, startY=2, endX=1, endY=1, startTime=currentTimeInAnimation, duration=moveDuration)
+currentTimeInAnimation += moveDuration
+boardMoveDuration = 2
+board5xDelta = -depth1horizontalSpacingBetweenLinesB/2
+board5yDelta = depth0verticalSpacingBetweenBoards + squareWidth*4*(videoWidth / videoHeight)
+smallDemoBoard5.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board5xDelta, yDelta=board5yDelta)
+currentTimeInAnimation += boardMoveDuration
+
+# board 4 move to place
+moveDuration = 2
+smallDemoBoard4.movePiece(startX=1, startY=0, endX=1, endY=1, startTime=currentTimeInAnimation, duration=moveDuration)
+currentTimeInAnimation += moveDuration
+boardMoveDuration = 2
+board4xDelta = +depth1horizontalSpacingBetweenLinesB/2
+board4yDelta = depth0verticalSpacingBetweenBoards + squareWidth*4*(videoWidth / videoHeight)
+smallDemoBoard4.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board4xDelta, yDelta=board4yDelta)
+currentTimeInAnimation += boardMoveDuration
+
+# change colour of board 2
+outlineDrawDuration = 2/tempTimeDiv
+smallDemoBoard2.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=outlineDrawDuration, holdDuration=videoDuration, startDrawProportion=0.6666, endDrawProportion=1)
+currentTimeInAnimation += outlineDrawDuration
+# Draw in the branches
+branchDrawDuration = 2/tempTimeDiv
+smallDemoBoard2.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += branchDrawDuration
+
+# Draw in repeat state cross out
+crossDrawDuration = 2/tempTimeDiv
+smallDemoBoard4.drawInCross(startTime=currentTimeInAnimation, drawDuration=crossDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += crossDrawDuration
+
+# Draw in distance of non-crossed board
+drawTextDuration = 1/tempTimeDiv
+smallDemoBoard5.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawTextDuration
+
+# Creating boards 8 and 9
+board8And9x = board4And5x + board5xDelta + 0.0035 - (18 / videoWidth)
+#added a small vertical offset as it was slightly unaligned
+board8And9y = board4And5y + board5yDelta + 0.003
+
+smallDemoBoard8 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board8And9x, y=board8And9y, squareWidth=squareWidth,
+                                 pieceLayout=[[None, 'white_pawn', None],
+                                              ['white_pawn', 'white_knight' , 'white_pawn'],
+                                              ['white_rook', None , 'white_bishop']],
+                                 text="Distance: 4",
+                                 branchInfoList=[BranchInfo('c2->a2', 'solid', 0.8),
+                                                 BranchInfo('a3->b3', 'solid', 0.8)],
+                                 horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
+                                 verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
+                                 squareCoordinateTextScale=1.5,
+                                 mainTextScale=1.5,
+                                 xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.35,
+                                 dashedBranchTextProportion=1,
+                                 firtColour=(0,255,0)
+                                 )
+
+smallDemoBoard9 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board8And9x, y=board8And9y, squareWidth=squareWidth,
+                                 pieceLayout=[[None, 'white_pawn', None],
+                                              ['white_pawn', 'white_knight', 'white_pawn'],
+                                              ['white_rook', None, 'white_bishop']],
+                                 text="Distance: 4",
+                                 branchInfoList=[BranchInfo('a2->c2', 'solid', 0.8),
+                                                 BranchInfo('c3->b1', 'solid', 0.8)],
+                                 horizontalSpacingBetweenLines=depth2horizontalSpacingBetweenLines,
+                                 verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
+                                 squareCoordinateTextScale=1.5,
+                                 mainTextScale=1.5,
+                                 xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.35,
+                                 dashedBranchTextProportion=1,
+                                 firtColour=(0,255,0)
+                                 )
+
+#Drawing in board 8 and 9
+preDrawHoldTime = 3/tempTimeDiv
+currentTimeInAnimation = currentTimeInAnimation + preDrawHoldTime
+drawDuration = 2/tempTimeDiv
+smallDemoBoard8.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard8.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard8.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+                                   endDrawProportion=0.3333)
+
+smallDemoBoard9.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard9.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard9.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+                                   endDrawProportion=0.3333)
+
+# Expanding board 5
+moveDuration = 2
+smallDemoBoard9.movePiece(startX=1, startY=0, endX=0, endY=0, startTime=currentTimeInAnimation, duration=moveDuration)
+currentTimeInAnimation += moveDuration
+boardMoveDuration = 2
+board9xDelta = board5xDelta
+board9yDelta = board5yDelta
+smallDemoBoard9.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board9xDelta, yDelta=board9yDelta)
+currentTimeInAnimation += boardMoveDuration
+
+smallDemoBoard8.movePiece(startX=0, startY=2, endX=1, endY=2, startTime=currentTimeInAnimation, duration=moveDuration)
+currentTimeInAnimation += moveDuration
+boardMoveDuration = 2
+board8xDelta = board4xDelta
+board8yDelta = board4yDelta
+smallDemoBoard8.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board8xDelta, yDelta=board8yDelta)
+currentTimeInAnimation += boardMoveDuration
+
+# change colour of board 5
+outlineDrawDuration = 2
+smallDemoBoard5.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=outlineDrawDuration, holdDuration=videoDuration, startDrawProportion=0.6666, endDrawProportion=1)
+currentTimeInAnimation += outlineDrawDuration
+# Draw in the branches
+branchDrawDuration = 2/tempTimeDiv
+smallDemoBoard5.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += branchDrawDuration
+
+# Draw in distance of non-crossed boards
+drawTextDuration = 1/tempTimeDiv
+smallDemoBoard9.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawTextDuration
+
+smallDemoBoard8.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawTextDuration
 
 
 
