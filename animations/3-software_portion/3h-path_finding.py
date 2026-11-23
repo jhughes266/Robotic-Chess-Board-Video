@@ -231,6 +231,14 @@ class SmallDemoBoard:
                     pt2=[branchXdestination, branchYdestination],
                     colour=(255, 255, 255), thickness=5, drawProportion=0, frameWidth=videoWidth,
                     frameHeight=videoHeight))
+
+            # Traceback lines
+            self.__traceBackPrimitives.append(Line(
+                pt1=[branchXdestination, branchYdestination],
+                pt2=[branchXOrigin, branchYOrigin],
+                colour=self.__traceBackLineColour, thickness=10, drawProportion=0, frameWidth=videoWidth,
+                frameHeight=videoHeight))
+
             # Branching text
             proportion = branchInfo.textPositionProportion
             textX = branchXOrigin + (branchXdestination - branchXOrigin) * proportion
@@ -241,12 +249,7 @@ class SmallDemoBoard:
                      insertCursorThickness=5,
                      frameWidth=videoWidth, frameHeight=videoHeight, drawOverElementsBehind=True))
 
-            # Traceback lines
-            self.__traceBackPrimitives.append(Line(
-                pt1=[branchXdestination, branchYdestination],
-                pt2=[branchXOrigin, branchYOrigin],
-                colour=self.__traceBackLineColour, thickness=10, drawProportion=0, frameWidth=videoWidth,
-                frameHeight=videoHeight))
+
 
     def drawInCross(self, startTime, drawDuration, holdDuration):
         drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
@@ -451,6 +454,9 @@ class SmallDemoBoard:
         for primitive in self.__branchesPrimitives:
             moveAnimation.addPrimitive(primitive)
 
+        for primitive in self.__traceBackPrimitives:
+            moveAnimation.addPrimitive(primitive)
+
         for row in self.__piecesPrimitivesLayout:
             for primitive in row:
                 if primitive is None:
@@ -536,7 +542,7 @@ class EntireAnimationMover:
 videoWidth = int(3840)
 videoHeight = int(2160)
 fps = 30
-videoDuration = 85
+videoDuration = 110
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration,
                                outputFile='3h-path_finding.mp4')
 
@@ -1287,6 +1293,148 @@ currentTimeInAnimation += drawTextDuration
 drawTextDuration = 1/tempTimeDiv
 smallDemoBoard14.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
 currentTimeInAnimation += drawTextDuration
+
+
+
+
+
+
+
+
+
+
+
+
+# Move everything up to make room for the rest of the animation
+moveDuration = 2
+move2upyDelta = -0.6
+entireAnimationMover.move(startTime=currentTimeInAnimation, duration=moveDuration, xDelta=0, yDelta=move2upyDelta)
+currentTimeInAnimation += moveDuration
+
+
+# Creating boards 16 and 17
+board16And17x = board14And15x + board15xDelta + 0.0035 - (19 / videoWidth)
+#added a small vertical offset as it was slightly unaligned
+board16And17y = board14And15y + board15yDelta + 0.003 - (18/ videoHeight) + move2upyDelta
+
+smallDemoBoard16 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board16And17x, y=board16And17y, squareWidth=squareWidth,
+                                 pieceLayout=[[None, 'white_pawn' , 'white_knight'],
+                                              ['white_pawn', None , 'white_pawn'],
+                                              ['white_rook', None , 'white_bishop']],
+                                 text="Distance: 0",
+                                 branchInfoList=[BranchInfo('c2->a2', 'solid', 0.8),
+                                                 BranchInfo('a3->b3', 'solid', 0.8)],
+                                 horizontalSpacingBetweenLines=depth1horizontalSpacingBetweenLinesB,
+                                 verticalSpacingBetweenBoards=depth1verticalSpacingBetweenBoards,
+                                 squareCoordinateTextScale=1.5,
+                                 mainTextScale=1.5,
+                                 xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.15,
+                                 dashedBranchTextProportion=1,
+                                 firtColour=(0,255,0),
+                                 secondColour=(0,0,255)
+                                 )
+entireAnimationMover.addEntityToMoveList(smallDemoBoard16)
+
+smallDemoBoard17 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=board16And17x, y=board16And17y, squareWidth=squareWidth,
+                                  pieceLayout=[[None, 'white_pawn', 'white_knight'],
+                                               ['white_pawn', None, 'white_pawn'],
+                                               ['white_rook', None, 'white_bishop']],
+                                  text="Distance: 2",
+                                 branchInfoList=[BranchInfo('a2->c2', 'solid', 0.8),
+                                                 BranchInfo('c3->b1', 'solid', 0.8)],
+                                 horizontalSpacingBetweenLines=depth1horizontalSpacingBetweenLinesB,
+                                 verticalSpacingBetweenBoards=depth2verticalSpacingBetweenBoards,
+                                 squareCoordinateTextScale=1.5,
+                                 mainTextScale=1.5,
+                                 xPerimeterSpacingFromTop=xPerimeterSpacingFromTop,
+                                 videoWidth=videoWidth, videoHeight=videoHeight,
+                                 dashedBranch=True,
+                                 dashedBranchLengthProportion=0.15,
+                                 dashedBranchTextProportion=1,
+                                 firtColour=(0,255,0),
+                                 secondColour=(0,0,255)
+                                 )
+entireAnimationMover.addEntityToMoveList(smallDemoBoard17)
+
+#Drawing in board 14 and 15
+preDrawHoldTime = 3/tempTimeDiv
+currentTimeInAnimation = currentTimeInAnimation + preDrawHoldTime
+drawDuration = 2/tempTimeDiv
+smallDemoBoard17.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard17.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard17.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+                                   endDrawProportion=0.3333)
+
+smallDemoBoard16.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard16.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard16.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+                                   endDrawProportion=0.3333)
+
+
+# Expanding board 15
+moveDuration = 2
+smallDemoBoard17.movePiece(startX=2, startY=2, endX=1, endY=2, startTime=currentTimeInAnimation, duration=moveDuration)
+currentTimeInAnimation += moveDuration
+boardMoveDuration = 2
+board17xDelta = board5xDelta
+board17yDelta = board5yDelta
+smallDemoBoard17.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board17xDelta, yDelta=board17yDelta)
+currentTimeInAnimation += boardMoveDuration
+
+smallDemoBoard16.movePiece(startX=1, startY=0, endX=1, endY=1, startTime=currentTimeInAnimation, duration=moveDuration)
+currentTimeInAnimation += moveDuration
+boardMoveDuration = 2
+board16xDelta = board4xDelta
+board16yDelta = board4yDelta
+smallDemoBoard16.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board16xDelta, yDelta=board16yDelta)
+currentTimeInAnimation += boardMoveDuration
+
+
+# change colour of board 15
+outlineDrawDuration = 2
+smallDemoBoard15.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=outlineDrawDuration, holdDuration=videoDuration, startDrawProportion=0.6666, endDrawProportion=1)
+currentTimeInAnimation += outlineDrawDuration
+# Draw in the branches
+branchDrawDuration = 2/tempTimeDiv
+smallDemoBoard15.drawInBranches(startTime=currentTimeInAnimation, drawDuration=branchDrawDuration, holdDuration=videoDuration)
+currentTimeInAnimation += branchDrawDuration
+###
+
+# Draw in distance of non-crossed boards
+drawTextDuration = 1/tempTimeDiv
+smallDemoBoard17.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawTextDuration
+
+drawTextDuration = 1/tempTimeDiv
+smallDemoBoard16.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
+currentTimeInAnimation += drawTextDuration
+
+# Tracing back up the tree
+traceBackDrawDuration = 1
+smallDemoBoard15.drawInTraceBack(startTime=currentTimeInAnimation, drawDuration=traceBackDrawDuration, holdDuration=videoDuration, lineIndex=1)
+currentTimeInAnimation += traceBackDrawDuration
+smallDemoBoard13.drawInTraceBack(startTime=currentTimeInAnimation, drawDuration=traceBackDrawDuration, holdDuration=videoDuration, lineIndex=0)
+currentTimeInAnimation += traceBackDrawDuration
+smallDemoBoard10.drawInTraceBack(startTime=currentTimeInAnimation, drawDuration=traceBackDrawDuration, holdDuration=videoDuration, lineIndex=0)
+currentTimeInAnimation += traceBackDrawDuration
+smallDemoBoard9.drawInTraceBack(startTime=currentTimeInAnimation, drawDuration=traceBackDrawDuration, holdDuration=videoDuration, lineIndex=1)
+currentTimeInAnimation += traceBackDrawDuration
+smallDemoBoard5.drawInTraceBack(startTime=currentTimeInAnimation, drawDuration=traceBackDrawDuration, holdDuration=videoDuration, lineIndex=0)
+currentTimeInAnimation += traceBackDrawDuration
+smallDemoBoard2.drawInTraceBack(startTime=currentTimeInAnimation, drawDuration=traceBackDrawDuration, holdDuration=videoDuration, lineIndex=0)
+currentTimeInAnimation += traceBackDrawDuration
+smallDemoBoard1.drawInTraceBack(startTime=currentTimeInAnimation, drawDuration=traceBackDrawDuration, holdDuration=videoDuration, lineIndex=1)
+currentTimeInAnimation += traceBackDrawDuration
+
+
+# Move everything up to make room for the rest of the animation
+moveDuration = 6
+moveDownDelta = 1.2
+entireAnimationMover.move(startTime=currentTimeInAnimation, duration=moveDuration, xDelta=0, yDelta=moveDownDelta)
+currentTimeInAnimation += moveDuration
 
 
 print(f"The animation is {currentTimeInAnimation} seconds long")
