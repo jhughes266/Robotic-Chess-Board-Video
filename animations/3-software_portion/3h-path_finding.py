@@ -39,6 +39,7 @@ class SmallDemoBoard:
 
         # Colour changing outline and black background
         self.__colourChangingOutlinePrimitives = []
+        self.__flashingSelectionPrimitives = []
         xSpacingFromTopLeft = self.__xPerimeterSpacingFromTop
         ySpacingFromTopLeft = xSpacingFromTopLeft * self.__videoWidth / self.__videoHeight
         outlineTopLeftX = boardTopLeftX - xSpacingFromTopLeft
@@ -56,6 +57,16 @@ class SmallDemoBoard:
                                                                             thirdColour=thirdColour,
                                                                             frameWidth=videoWidth,
                                                                             frameHeight=videoHeight, thickness=5))
+
+        self.__flashingSelectionPrimitives.append(ColourChangeRectangle(pt1=[outlineTopLeftX, outlineTopLeftY],
+                                                                        pt2=[outlineBottomRightX,
+                                                                                 outlineBottomRightY],
+                                                                        drawProportion=0,
+                                                                        firstColour=(0,0,255),
+                                                                        secondColour=(0,0,255),
+                                                                        thirdColour=(0,0,255),
+                                                                        frameWidth=videoWidth,
+                                                                        frameHeight=videoHeight, thickness=20))
 
         # Cross Out
         self.__boardCrossOutPrimitives = []
@@ -249,7 +260,24 @@ class SmallDemoBoard:
                      insertCursorThickness=5,
                      frameWidth=videoWidth, frameHeight=videoHeight, drawOverElementsBehind=True))
 
+    def colourFlash(self, startTime, drawDuration, holdDuration, startDrawProportion, endDrawProportion):
+        drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=startDrawProportion, endDrawProportion=endDrawProportion, startTime=startTime,
+                                           endTime=startTime + drawDuration,
+                                           fps=fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
 
+        holdAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
+                                           startDrawProportion=endDrawProportion, endDrawProportion=endDrawProportion,
+                                           startTime=startTime + drawDuration,
+                                           endTime=startTime + drawDuration + holdDuration,
+                                           fps=fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
+
+        for primitive in self.__flashingSelectionPrimitives:
+            drawAnimation.addPrimitive(primitive)
+            holdAnimation.addPrimitive(primitive)
+
+        self.__sceneAnimator.addPrimitiveAnimation(drawAnimation)
+        self.__sceneAnimator.addPrimitiveAnimation(holdAnimation)
 
     def drawInCross(self, startTime, drawDuration, holdDuration):
         drawAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
@@ -444,6 +472,8 @@ class SmallDemoBoard:
                                            startTime=startTime,
                                            endTime=startTime + duration,
                                            fps=fps, frameWidth=videoWidth, frameHeight=videoHeight)
+        for primitive in self.__flashingSelectionPrimitives:
+            moveAnimation.addPrimitive(primitive)
 
         for primitive in self.__gridSquaresPrimitives:
             moveAnimation.addPrimitive(primitive)
@@ -456,6 +486,8 @@ class SmallDemoBoard:
 
         for primitive in self.__traceBackPrimitives:
             moveAnimation.addPrimitive(primitive)
+
+
 
         for row in self.__piecesPrimitivesLayout:
             for primitive in row:
@@ -542,7 +574,7 @@ class EntireAnimationMover:
 videoWidth = int(3840)
 videoHeight = int(2160)
 fps = 30
-videoDuration = 110
+videoDuration = 200
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration,
                                outputFile='3h-path_finding.mp4')
 
@@ -799,6 +831,18 @@ smallDemoBoard7.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuratio
 currentTimeInAnimation += drawDuration
 
 # Expanding board 3
+# Indicating which board we will expand
+numberOfFlashes = 5
+flashDuration = 1
+for i in range(numberOfFlashes):
+    smallDemoBoard3.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                                startDrawProportion=0, endDrawProportion=0.3333)
+
+    smallDemoBoard3.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                               startDrawProportion=0.3333, endDrawProportion=0)
+
+
+    currentTimeInAnimation += 2 * flashDuration
 
 # board 7 move to place
 moveDuration = 2
@@ -835,8 +879,18 @@ smallDemoBoard6.drawInMainText(startTime=currentTimeInAnimation, drawDuration=dr
 smallDemoBoard7.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawTextDuration, holdDuration=videoDuration)
 currentTimeInAnimation += drawTextDuration
 
-
 # Expanding board 2
+numberOfFlashes = 5
+flashDuration = 1
+for i in range(numberOfFlashes):
+    smallDemoBoard2.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                                startDrawProportion=0, endDrawProportion=0.3333)
+
+    smallDemoBoard2.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                               startDrawProportion=0.3333, endDrawProportion=0)
+
+
+    currentTimeInAnimation += 2 * flashDuration
 # board 5 move to place
 moveDuration = 2
 smallDemoBoard5.movePiece(startX=1, startY=2, endX=1, endY=1, startTime=currentTimeInAnimation, duration=moveDuration)
@@ -869,6 +923,7 @@ currentTimeInAnimation += branchDrawDuration
 # Draw in repeat state cross out
 crossDrawDuration = 2/tempTimeDiv
 smallDemoBoard4.drawInCross(startTime=currentTimeInAnimation, drawDuration=crossDrawDuration, holdDuration=videoDuration)
+smallDemoBoard4.drawInMainText(startTime=currentTimeInAnimation, drawDuration=crossDrawDuration, holdDuration=videoDuration)
 currentTimeInAnimation += crossDrawDuration
 
 # Draw in distance of non-crossed board
@@ -937,6 +992,19 @@ smallDemoBoard9.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuratio
                                    endDrawProportion=0.3333)
 
 # Expanding board 5
+numberOfFlashes = 5
+flashDuration = 1
+for i in range(numberOfFlashes):
+    smallDemoBoard5.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                                startDrawProportion=0, endDrawProportion=0.3333)
+
+    smallDemoBoard5.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                               startDrawProportion=0.3333, endDrawProportion=0)
+
+
+    currentTimeInAnimation += 2 * flashDuration
+
+
 moveDuration = 2
 smallDemoBoard9.movePiece(startX=1, startY=0, endX=0, endY=0, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
@@ -1041,6 +1109,20 @@ smallDemoBoard11.drawInBoardOutline(startTime=currentTimeInAnimation, drawDurati
                                    endDrawProportion=0.3333)
 
 # Expanding board 9
+numberOfFlashes = 5
+flashDuration = 1
+for i in range(numberOfFlashes):
+    smallDemoBoard9.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                                startDrawProportion=0, endDrawProportion=0.3333)
+
+    smallDemoBoard9.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                               startDrawProportion=0.3333, endDrawProportion=0)
+
+
+    currentTimeInAnimation += 2 * flashDuration
+
+
+
 moveDuration = 2
 smallDemoBoard11.movePiece(startX=0, startY=0, endX=1, endY=0, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
@@ -1070,6 +1152,7 @@ currentTimeInAnimation += branchDrawDuration
 # Draw in cross of repeat state
 crossDrawDuration = 2/tempTimeDiv
 smallDemoBoard11.drawInCross(startTime=currentTimeInAnimation, drawDuration=crossDrawDuration, holdDuration=videoDuration)
+smallDemoBoard11.drawInMainText(startTime=currentTimeInAnimation, drawDuration=crossDrawDuration, holdDuration=videoDuration)
 currentTimeInAnimation += crossDrawDuration
 
 # Draw in distance of non-crossed boards
@@ -1147,6 +1230,19 @@ smallDemoBoard13.drawInBoardOutline(startTime=currentTimeInAnimation, drawDurati
 
 
 # Expanding board 10
+numberOfFlashes = 5
+flashDuration = 1
+for i in range(numberOfFlashes):
+    smallDemoBoard10.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                                startDrawProportion=0, endDrawProportion=0.3333)
+
+    smallDemoBoard10.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                               startDrawProportion=0.3333, endDrawProportion=0)
+
+
+    currentTimeInAnimation += 2 * flashDuration
+
+
 moveDuration = 2
 smallDemoBoard13.movePiece(startX=1, startY=0, endX=2, endY=0, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
@@ -1257,6 +1353,19 @@ smallDemoBoard15.drawInBoardOutline(startTime=currentTimeInAnimation, drawDurati
 
 
 # Expanding board 13
+numberOfFlashes = 5
+flashDuration = 1
+for i in range(numberOfFlashes):
+    smallDemoBoard13.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                                startDrawProportion=0, endDrawProportion=0.3333)
+
+    smallDemoBoard13.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                               startDrawProportion=0.3333, endDrawProportion=0)
+
+
+    currentTimeInAnimation += 2 * flashDuration
+
+
 moveDuration = 2
 smallDemoBoard15.movePiece(startX=0, startY=0, endX=1, endY=0, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
@@ -1375,6 +1484,19 @@ smallDemoBoard16.drawInBoardOutline(startTime=currentTimeInAnimation, drawDurati
 
 
 # Expanding board 15
+numberOfFlashes = 5
+flashDuration = 1
+for i in range(numberOfFlashes):
+    smallDemoBoard15.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                                startDrawProportion=0, endDrawProportion=0.3333)
+
+    smallDemoBoard15.colourFlash(startTime=currentTimeInAnimation, drawDuration=flashDuration, holdDuration=0,
+                               startDrawProportion=0.3333, endDrawProportion=0)
+
+
+    currentTimeInAnimation += 2 * flashDuration
+
+
 moveDuration = 2
 smallDemoBoard17.movePiece(startX=2, startY=2, endX=1, endY=2, startTime=currentTimeInAnimation, duration=moveDuration)
 currentTimeInAnimation += moveDuration
@@ -1389,6 +1511,7 @@ currentTimeInAnimation += moveDuration
 boardMoveDuration = 2
 board16xDelta = board4xDelta
 board16yDelta = board4yDelta
+
 smallDemoBoard16.move(startTime=currentTimeInAnimation, duration=boardMoveDuration, xDelta=board16xDelta, yDelta=board16yDelta)
 currentTimeInAnimation += boardMoveDuration
 
