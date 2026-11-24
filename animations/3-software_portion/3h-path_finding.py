@@ -1472,15 +1472,19 @@ entireAnimationMover.addEntityToMoveList(smallDemoBoard17)
 preDrawHoldTime = 3/tempTimeDiv
 currentTimeInAnimation = currentTimeInAnimation + preDrawHoldTime
 drawDuration = 2/tempTimeDiv
-smallDemoBoard17.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
-smallDemoBoard17.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
-smallDemoBoard17.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
-                                   endDrawProportion=0.3333)
+
 
 smallDemoBoard16.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard16.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard16.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
+
+smallDemoBoard17.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard17.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
+smallDemoBoard17.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
+                                   endDrawProportion=0.3333)
+
+
 
 
 # Expanding board 15
@@ -1536,6 +1540,7 @@ smallDemoBoard16.drawInMainText(startTime=currentTimeInAnimation, drawDuration=d
 currentTimeInAnimation += drawTextDuration
 
 # Tracing back up the tree
+print(currentTimeInAnimation)
 traceBackDrawDuration = 1
 smallDemoBoard15.drawInTraceBack(startTime=currentTimeInAnimation, drawDuration=traceBackDrawDuration, holdDuration=videoDuration, lineIndex=1)
 currentTimeInAnimation += traceBackDrawDuration
