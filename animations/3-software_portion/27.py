@@ -521,28 +521,96 @@ class PieceValueSum:
 
         pieceValues = ['-3', '-9', '-10000', '1', '5', '10,000', '3']
 
-        pieceImageWidth = backGroundSqaureWidth / len(pieceValues)
+        pieceAndAdditionWidth = backGroundSqaureWidth / (len(pieceValues) + 2)
+        remainderWidth = backGroundSqaureWidth - len(self.__pieceNames) * pieceAndAdditionWidth
+        pieceImageWidth = pieceAndAdditionWidth * 0.6
 
         curY = topLeftY
         for i, name in enumerate(self.__pieceNames):
-            curX = topLeftX + i * pieceImageWidth
+            curX = topLeftX + i * pieceAndAdditionWidth
             self.__pieceImagePrimitives.append(Image(topLeft=[curX, curY],
                                                      imgPath='../resources/piece_images/' + name + '.jpg',
                                                      imageWidth=pieceImageWidth,
                                                      colour=None, drawProportion=0, maxNumBlurs=0,
                                                      frameWidth=videoWidth, frameHeight=videoHeight,
                                                      onlyKeepMonoChrome=True))
-            """
-            text = ' = ' + pieceValues[i]
-            print(text)
-            self.__pieceImagePrimitives.append(Text(text=text, org=[curX + textXOffset, curY + (pieceImageWidth/2) * (videoWidth/videoHeight)], fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1.7,
-                     colour=(255, 255, 255),
-                     backgroundColour=(21, 67, 120), drawProportion=0, progressiveDrawMode='letterByLetter',
-                     insertCursorThickness=5,
-                     frameWidth=videoWidth, frameHeight=videoHeight, drawOverElementsBehind=False))
-            """
+
+            if i != len(self.__pieceNames) - 1:
+                text = '+'
+            else:
+                text = '='
+            self.__pieceImagePrimitives.append(Text(text=text,
+                                                    org=[curX + pieceImageWidth + (pieceAndAdditionWidth - pieceImageWidth)/2, curY + (pieceImageWidth/2) * (videoWidth/videoHeight)],
+                                                    fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1.7,
+                                                    colour=(255, 255, 255),
+                                                    backgroundColour=(21, 67, 120), drawProportion=0, progressiveDrawMode='letterByLetter',
+                                                    insertCursorThickness=5,
+                                                    frameWidth=videoWidth, frameHeight=videoHeight, drawOverElementsBehind=False))
+
+        self.__pieceImagePrimitives.append(Text(text="Value",
+                                                org=[topLeftX + backGroundSqaureWidth - remainderWidth / 2,
+                                                     curY + (pieceImageWidth / 2) * (videoWidth / videoHeight)],
+                                                fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1.7,
+                                                colour=(255, 255, 255),
+                                                backgroundColour=(21, 67, 120), drawProportion=0,
+                                                progressiveDrawMode='letterByLetter',
+                                                insertCursorThickness=5,
+                                                frameWidth=videoWidth, frameHeight=videoHeight,
+                                                drawOverElementsBehind=False))
+
+
+        yOffset = pieceImageWidth * (videoWidth / videoHeight) * 1.5
+        curY += yOffset
+        for i, value in enumerate(pieceValues):
+            curX = topLeftX + i * pieceAndAdditionWidth
+            self.__pieceImagePrimitives.append(Text(text=value,
+                                                    org=[curX + pieceImageWidth / 2,
+                                                         curY + (pieceImageWidth / 2) * (videoWidth / videoHeight)],
+                                                    fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1.7,
+                                                    colour=(255, 255, 255),
+                                                    backgroundColour=(21, 67, 120), drawProportion=0,
+                                                    progressiveDrawMode='letterByLetter',
+                                                    insertCursorThickness=5,
+                                                    frameWidth=videoWidth, frameHeight=videoHeight,
+                                                    drawOverElementsBehind=False))
+
+            if i != len(self.__pieceNames) - 1:
+                text = '+'
+            else:
+                text = '='
+            self.__pieceImagePrimitives.append(Text(text=text,
+                                                    org=[curX + pieceImageWidth + (pieceAndAdditionWidth - pieceImageWidth)/2, curY + (pieceImageWidth/2) * (videoWidth/videoHeight)],
+                                                    fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1.7,
+                                                    colour=(255, 255, 255),
+                                                    backgroundColour=(21, 67, 120), drawProportion=0, progressiveDrawMode='letterByLetter',
+                                                    insertCursorThickness=5,
+                                                    frameWidth=videoWidth, frameHeight=videoHeight, drawOverElementsBehind=False))
+
+        self.__pieceImagePrimitives.append(Text(text="-3",
+                                                org=[topLeftX + backGroundSqaureWidth - remainderWidth / 2,
+                                                     curY + (pieceImageWidth / 2) * (videoWidth / videoHeight)],
+                                                fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1.7,
+                                                colour=(255, 255, 255),
+                                                backgroundColour=(21, 67, 120), drawProportion=0,
+                                                progressiveDrawMode='letterByLetter',
+                                                insertCursorThickness=5,
+                                                frameWidth=videoWidth, frameHeight=videoHeight,
+                                                drawOverElementsBehind=False))
+
+        self.__pieceImagePrimitives.append(Text(text="Value = -3",
+                                                org=[topLeftX + backGroundSqaureWidth/2,
+                                                     curY + (5 * pieceImageWidth / 2) * (videoWidth / videoHeight)],
+                                                fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=7,
+                                                colour=(255, 255, 255),
+                                                backgroundColour=(21, 67, 120), drawProportion=0,
+                                                progressiveDrawMode='letterByLetter',
+                                                insertCursorThickness=5,
+                                                frameWidth=videoWidth, frameHeight=videoHeight,
+                                                drawOverElementsBehind=False))
+
 
     def drawIn(self, startTime, backgroundDrawDuration, pieceAndTextDrawDuration, videoDuration):
+        timeElapsed = 0
         drawBackgroundAnimation = PrimitiveAnimation(startLocation=[0.0, 0.0], endLocation=[0.0, 0.0],
                                                      startDrawProportion=0, endDrawProportion=1,
                                                      startTime=startTime,
@@ -555,7 +623,7 @@ class PieceValueSum:
                                            endTime=videoDuration,
                                            fps=self.__fps, frameWidth=self.__videoWidth, frameHeight=self.__videoHeight)
 
-
+        timeElapsed += backgroundDrawDuration
         drawBackgroundAnimation.addPrimitive(self.__backgroundRectangle)
         holdBackgroundAnimation.addPrimitive(self.__backgroundRectangle)
 
@@ -579,15 +647,18 @@ class PieceValueSum:
             drawPieceAndTextAnimation.addPrimitive(primitive)
             holdPieceAndTextAnimation.addPrimitive(primitive)
 
+            timeElapsed += pieceAndTextDrawDuration
+
             self.__sceneAnimator.addPrimitiveAnimation(drawPieceAndTextAnimation)
             self.__sceneAnimator.addPrimitiveAnimation(holdPieceAndTextAnimation)
+        return timeElapsed
 
 
 
 videoWidth = int(3840)
 videoHeight = int(2160)
 fps = 30
-videoDuration = 5
+videoDuration = 8
 sceneAnimator = SceneAnimation(videoWidth=videoWidth, videoHeight=videoHeight, fps=fps, videoDuration=videoDuration,
                                outputFile='27.mp4')
 
@@ -609,11 +680,11 @@ depth1verticalSpacingBetweenBoards=1.5 * squareWidth * (videoWidth / videoHeight
 depth2horizontalSpacingBetweenLines=0.05
 depth2verticalSpacingBetweenBoards=1.5 * squareWidth * (videoWidth / videoHeight)
 
-smallDemoBoard1 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=0.35, y=0.4, squareWidth=squareWidth,
+smallDemoBoard1 = SmallDemoBoard(sceneAnimator=sceneAnimator, x=0.2, y=0.4, squareWidth=squareWidth,
                                  pieceLayout=[['black_bishop', 'black_queen', 'black_king'],
                                               [None, None, 'white_pawn'],
                                               ['white_rook', 'white_king', 'white_knight']],
-                                 text="Distance: 3",
+                                 text="Value: -3",
                                  branchInfoList=[BranchInfo('c3->b1', 'solid', 0.6),
                                                  BranchInfo('c2->a2', 'solid', 0.6)
                                                  ],
@@ -636,10 +707,13 @@ smallDemoBoard1.drawInChessSquare(startTime=currentTimeInAnimation, drawDuration
 smallDemoBoard1.drawInPieces(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 smallDemoBoard1.drawInBoardOutline(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration, startDrawProportion=0.0,
                                    endDrawProportion=0.3333)
-smallDemoBoard1.drawInMainText(startTime=currentTimeInAnimation, drawDuration=drawDuration, holdDuration=videoDuration)
 
-pieceValues = PieceValueSum(sceneAnimator=sceneAnimator, topLeftY=0.1, topLeftX=0.2, backGroundSqaureWidth=0.6, backGroundSqaureHeight=.4, videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
+currentTimeInAnimation += 2
+
+pieceValues = PieceValueSum(sceneAnimator=sceneAnimator, topLeftY=0.2, topLeftX=0.35, backGroundSqaureWidth=0.6, backGroundSqaureHeight=.4, videoWidth=videoWidth, videoHeight=videoHeight, fps=fps)
 pieceValues.drawIn(startTime=0, backgroundDrawDuration=2, pieceAndTextDrawDuration=0.125, videoDuration=videoDuration)
 
 
+smallDemoBoard1.drawInMainText(startTime=6, drawDuration=1, holdDuration=videoDuration)
+currentTimeInAnimation += drawDuration
 sceneAnimator.renderAnimation()
